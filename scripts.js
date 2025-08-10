@@ -108,16 +108,32 @@ document.addEventListener("keydown", function (e) {
       for (let i = 0; i < gridSize; i++) {
         const v = document.getElementById("video" + i);
         if (shuffled[i]) {
-          const url = URL.createObjectURL(shuffled[i]);
-          v.src = url;
-          v.muted = true;
-          v.load();
-          v.onloadedmetadata = function () {
-            v.currentTime = v.duration * 0.5;
-            v.play();
-          };
+          let url;
+          if (shuffled[i] instanceof File || shuffled[i] instanceof Blob) {
+            url = URL.createObjectURL(shuffled[i]);
+          } else if (typeof shuffled[i] === "string") {
+            // Assume it's a file path and use it directly
+            url = shuffled[i];
+          } else {
+            console.error("Invalid video file in shuffled pool:", shuffled[i]);
+            v.src = "";
+            continue;
+          }
+
+          if (v) {
+            v.src = url;
+            v.muted = true;
+            v.load();
+            v.onloadedmetadata = function () {
+              v.currentTime = v.duration * 0.5;
+              v.play();
+            };
+          } else {
+            console.error("Video element not found for index:", i);
+          }
         } else {
-          v.src = "";
+          console.error("Invalid video file in shuffled pool:", shuffled[i]);
+          if (v) v.src = "";
         }
       }
     } else {
