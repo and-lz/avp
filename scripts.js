@@ -74,6 +74,23 @@ function setVideoSourceAndPlay(video, src) {
   };
 }
 
+// New helper function to set video source only (no playback)
+function setVideoSource(video, src) {
+  if (video && src) {
+    video.src = src;
+    video.muted = true;
+    video.load();
+    video.onloadedmetadata = function () {
+      video.currentTime = video.duration * 0.5;
+      video.play().catch((error) => {
+        console.error("Video playback failed:", error);
+      });
+    };
+  } else if (video) {
+    video.src = "";
+  }
+}
+
 // Refactored DOMContentLoaded logic
 function handleDOMContentLoaded() {
   if (loadVideosFromLocalStorage()) {

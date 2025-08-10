@@ -21,6 +21,8 @@ if (
   let lastCommandTime = 0; // To debounce commands
   const CONFIDENCE_THRESHOLD = 0.8; // Minimum confidence level
 
+  let isRecognitionActive = false;
+
   recognition.onresult = function (event) {
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const command = event.results[i][0].transcript.trim().toLowerCase();
@@ -80,6 +82,29 @@ if (
     console.log("Speech recognition ended. Restarting...");
     recognition.start(); // Restart recognition
   };
+
+  function toggleSpeechRecognition() {
+    if (isRecognitionActive) {
+      recognition.stop();
+      isRecognitionActive = false;
+      console.log("Speech recognition stopped.");
+    } else {
+      recognition.start();
+      isRecognitionActive = true;
+      console.log("Speech recognition started.");
+    }
+  }
+
+  // Add a button to toggle speech recognition
+  const toggleButton = document.createElement("button");
+  toggleButton.textContent = "Toggle Speech Recognition";
+  toggleButton.style.position = "fixed";
+  toggleButton.style.bottom = "50px";
+  toggleButton.style.left = "50%";
+  toggleButton.style.transform = "translateX(-50%)";
+  toggleButton.style.zIndex = "1000";
+  toggleButton.addEventListener("click", toggleSpeechRecognition);
+  document.body.appendChild(toggleButton);
 
   // Start listening
   recognition.start();
