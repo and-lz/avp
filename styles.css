@@ -1,24 +1,29 @@
+#poolBtn {
+  position: fixed;
+  right: 50px;
+  bottom: 50px;
+  background: #000;
+  border: none;
+  font-size: 1.5em;
+  opacity: 0.5;
+  cursor: pointer;
+  z-index: 999;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.3em 0.6em;
+  width: 50px;
+  aspect-ratio: 1/1;
+}
 /* Updated to use CSS nesting */
 html,
 body {
+  background-color: #000;
   height: 100%;
   margin: 0;
   padding: 0;
   width: 100dvw;
   height: 100dvh;
   overflow: hidden;
-
-  body {
-    width: 100dvw;
-    height: 100dvh;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
 }
 
 .video-container {
@@ -86,12 +91,4 @@ input[type="file"] {
   opacity: 0;
   width: 1px;
   height: 1px;
-}
-
-#poolBtn {
-  position: fixed;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 102;
 }

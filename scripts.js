@@ -245,7 +245,19 @@ initializeGrid(gridSize);
 
 // Keyboard controls for grid size
 document.addEventListener("keydown", function (e) {
-  if (e.key === "+" || e.key === "=") {
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    // Seek all videos by ±5 seconds
+    const videos = document.querySelectorAll("video");
+    videos.forEach((video) => {
+      if (!isNaN(video.duration)) {
+        if (e.key === "ArrowLeft") {
+          video.currentTime = Math.max(0, video.currentTime - 5);
+        } else {
+          video.currentTime = Math.min(video.duration, video.currentTime + 5);
+        }
+      }
+    });
+  } else if (e.key === "+" || e.key === "=") {
     gridSize += 1;
     initializeGrid(gridSize);
     // Re-apply videos from pool immediately
