@@ -246,17 +246,18 @@ initializeGrid(gridSize);
 // Keyboard controls for grid size
 document.addEventListener("keydown", function (e) {
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-    // Seek all videos by ±5 seconds
-    const videos = document.querySelectorAll("video");
-    videos.forEach((video) => {
-      if (!isNaN(video.duration)) {
-        if (e.key === "ArrowLeft") {
-          video.currentTime = Math.max(0, video.currentTime - 5);
-        } else {
-          video.currentTime = Math.min(video.duration, video.currentTime + 5);
-        }
+    // Seek only the video being hovered
+    const hovered = document.querySelector("video:hover");
+    if (hovered && !isNaN(hovered.duration)) {
+      if (e.key === "ArrowLeft") {
+        hovered.currentTime = Math.max(0, hovered.currentTime - 5);
+      } else {
+        hovered.currentTime = Math.min(
+          hovered.duration,
+          hovered.currentTime + 5
+        );
       }
-    });
+    }
   } else if (e.key === "+" || e.key === "=") {
     gridSize += 1;
     initializeGrid(gridSize);
