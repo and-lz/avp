@@ -1,4 +1,4 @@
-// Common parameters for the application
+// Use helpers from window.dom and window.util
 const APP_CONFIG = {
   basePath:
     "/Users/andreluiz/Library/Mobile Documents/com~apple~CloudDocs/avp/",
@@ -6,54 +6,6 @@ const APP_CONFIG = {
     shuffleVideos: "r",
   },
 };
-
-// Helper function to create and configure video elements
-function createVideoElement(id) {
-  const video = document.createElement("video");
-  video.id = id;
-  video.controls = false;
-  video.preload = false;
-  video.muted = true;
-  video.style.cursor = "default";
-  video.style.userSelect = "none";
-  return video;
-}
-
-// Helper function to create and configure input elements
-function createInputElement(id, accept = "video/*", multiple = true) {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.id = id;
-  input.accept = accept;
-  input.multiple = multiple;
-  return input;
-}
-
-// Helper function to throttle function calls
-function throttle(fn, wait) {
-  let last = 0;
-  return function (...args) {
-    const now = Date.now();
-    if (now - last >= wait) {
-      last = now;
-      fn.apply(this, args);
-    }
-  };
-}
-
-// Helper function to set styles on an element
-function setStyles(element, styles) {
-  Object.assign(element.style, styles);
-}
-
-// Grid templates optimized for 16:9 videos
-function getGridTemplate(size) {
-  if (size === 4) return { cols: 2, rows: 2 }; // 2x2
-  if (size === 6) return { cols: 3, rows: 2 }; // 3x2
-  if (size === 9) return { cols: 3, rows: 3 }; // 3x3 (square, but common)
-  if (size === 12) return { cols: 4, rows: 3 }; // 4x3
-  return { cols: 3, rows: 2 };
-}
 
 let videoPool = [];
 let videoPoolIndex = 0;
@@ -65,14 +17,19 @@ let shownVideos = new Set();
 function initializeGrid(size) {
   const grid = document.getElementById("videoGrid");
   grid.innerHTML = "";
-  const { cols, rows } = getGridTemplate(size);
+  const { cols, rows } = window.util.getGridTemplate(size);
   grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
   for (let i = 0; i < size; i++) {
     const container = document.createElement("div");
     container.className = "video-container";
-    const video = createVideoElement(`video${i}`);
-    const input = createInputElement(`input${i}`);
+    const video = document.createElement("video");
+    video.id = `video${i}`;
+    const input = document.createElement("input");
+    input.id = `input${i}`;
+    input.type = "file";
+    input.accept = "video/*";
+    input.multiple = true;
     container.appendChild(video);
     container.appendChild(input);
     grid.appendChild(container);
@@ -215,20 +172,8 @@ document.getElementById("gridSize").addEventListener("change", function (e) {
 });
 
 // Scrubbing is now per-video: mousemove over a video sets only that video's currentTime
-// Throttle helper
-function throttle(fn, wait) {
-  let last = 0;
-  return function (...args) {
-    const now = Date.now();
-    if (now - last >= wait) {
-      last = now;
-      fn.apply(this, args);
-    }
-  };
-}
-
 function addScrubHandler(video) {
-  const throttledScrub = throttle(function (e) {
+  const throttledScrub = window.util.throttle(function (e) {
     const rect = video.getBoundingClientRect();
     const percent = Math.min(
       Math.max((e.clientX - rect.left) / rect.width, 0),
@@ -252,12 +197,16 @@ function attachFullscreenHandlers() {
         }
       });
 
-      setFullscreenVideoStyles(video);
+      video.requestFullscreen().catch((error) => {
+        console.error("Error attempting to enable fullscreen mode:", error);
+      });
 
       video.addEventListener(
         "click",
         function exitFullscreenHandler() {
-          resetVideoStyles(video);
+          document.exitFullscreen().catch((error) => {
+            console.error("Error exiting fullscreen mode:", error);
+          });
 
           // Play all videos again
           videos.forEach((v) => {
@@ -270,28 +219,6 @@ function attachFullscreenHandlers() {
       );
     });
   });
-}
-
-// Helper function to reset video styles
-function resetVideoStyles(video) {
-  video.style.position = "";
-  video.style.top = "";
-  video.style.left = "";
-  video.style.width = "";
-  video.style.height = "";
-  video.style.zIndex = "";
-  video.style.backgroundColor = "";
-}
-
-// Helper function to set fullscreen video styles
-function setFullscreenVideoStyles(video) {
-  video.style.position = "fixed";
-  video.style.top = "0";
-  video.style.left = "0";
-  video.style.width = "100vw";
-  video.style.height = "100vh";
-  video.style.zIndex = "1000";
-  video.style.backgroundColor = "#000";
 }
 
 function applyVideosFromPool(forceReload = false) {
@@ -354,13 +281,17 @@ document.addEventListener("DOMContentLoaded", () => {
   videos.forEach((video) => {
     // Add fullscreen behavior on click
     video.addEventListener("click", () => {
-      setFullscreenVideoStyles(video);
+      video.requestFullscreen().catch((error) => {
+        console.error("Error attempting to enable fullscreen mode:", error);
+      });
 
       // Exit fullscreen on second click
       video.addEventListener(
         "click",
         () => {
-          resetVideoStyles(video);
+          document.exitFullscreen().catch((error) => {
+            console.error("Error exiting fullscreen mode:", error);
+          });
         },
         { once: true }
       );
