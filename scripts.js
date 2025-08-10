@@ -243,9 +243,37 @@ function attachHandlers(size) {
 let gridSize = 6;
 initializeGrid(gridSize);
 
-document.getElementById("gridSize").addEventListener("change", function (e) {
-  gridSize = parseInt(e.target.value, 10);
-  initializeGrid(gridSize);
+// Keyboard controls for grid size
+document.addEventListener("keydown", function (e) {
+  if (e.key === "+" || e.key === "=") {
+    gridSize += 1;
+    initializeGrid(gridSize);
+    // Re-apply videos from pool immediately
+    for (let i = 0; i < gridSize; i++) {
+      const video = document.getElementById(`video${i}`);
+      const src = videoPool[i] ? (videoPool[i] instanceof File ? URL.createObjectURL(videoPool[i]) : videoPool[i]) : "";
+      if (src) {
+        setVideoSourceAndPlay(video, src);
+      } else {
+        video.src = "";
+      }
+    }
+  } else if (e.key === "-" || e.key === "_" || e.key === "–") {
+    if (gridSize > 1) {
+      gridSize -= 1;
+      if (gridSize < 1) gridSize = 1;
+      initializeGrid(gridSize);
+      for (let i = 0; i < gridSize; i++) {
+        const video = document.getElementById(`video${i}`);
+        const src = videoPool[i] ? (videoPool[i] instanceof File ? URL.createObjectURL(videoPool[i]) : videoPool[i]) : "";
+        if (src) {
+          setVideoSourceAndPlay(video, src);
+        } else {
+          video.src = "";
+        }
+      }
+    }
+  }
 });
 
 // Scrubbing is now per-video: mousemove over a video sets only that video's currentTime
@@ -297,7 +325,6 @@ function attachFullscreenHandlers() {
 }
 
 function applyVideosFromPool(forceReload = false) {
-  const gridSize = parseInt(document.getElementById("gridSize").value, 10);
   initializeGrid(gridSize);
   videoPoolIndex = 0; // Reset index when grid size changes
 
