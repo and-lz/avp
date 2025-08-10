@@ -97,23 +97,31 @@ document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
 
 // Update key event listener to use the 'R' key for changing videos
 document.addEventListener("keydown", function (e) {
-  if (e.key === APP_CONFIG.shortcuts.shuffleVideos && videoPool.length > 0) {
-    // Shuffle pool and pick gridSize videos
-    const shuffled = videoPool.slice().sort(() => Math.random() - 0.5);
-    for (let i = 0; i < gridSize; i++) {
-      const v = document.getElementById("video" + i);
-      if (shuffled[i]) {
-        const url = URL.createObjectURL(shuffled[i]);
-        v.src = url;
-        v.muted = true;
-        v.load();
-        v.onloadedmetadata = function () {
-          v.currentTime = v.duration * 0.5;
-          v.play();
-        };
-      } else {
-        v.src = "";
+  console.log("Key pressed:", e.key);
+  console.log("Video pool length:", videoPool.length);
+
+  if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
+    if (videoPool.length > 0) {
+      console.log("Shuffling videos...");
+      // Shuffle pool and pick gridSize videos
+      const shuffled = videoPool.slice().sort(() => Math.random() - 0.5);
+      for (let i = 0; i < gridSize; i++) {
+        const v = document.getElementById("video" + i);
+        if (shuffled[i]) {
+          const url = URL.createObjectURL(shuffled[i]);
+          v.src = url;
+          v.muted = true;
+          v.load();
+          v.onloadedmetadata = function () {
+            v.currentTime = v.duration * 0.5;
+            v.play();
+          };
+        } else {
+          v.src = "";
+        }
       }
+    } else {
+      console.log("Video pool is empty. Cannot shuffle videos.");
     }
   }
 });
