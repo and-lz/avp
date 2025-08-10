@@ -39,6 +39,8 @@ body {
     cursor: pointer;
     background: #222;
     display: block;
+    will-change: transform, opacity;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   }
 }
 

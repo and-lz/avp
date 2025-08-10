@@ -18,7 +18,16 @@ function getGridTemplate(size) {
   return { cols: 3, rows: 2 };
 }
 
+function debounce(fn, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
 window.util = {
   throttle,
   getGridTemplate,
+  debounce,
 };

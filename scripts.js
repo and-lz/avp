@@ -1,5 +1,26 @@
 // Removed ES6 import and updated references to use window.grid
 
+// Lazy load videos using Intersection Observer
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    const video = entry.target;
+    if (entry.isIntersecting) {
+      video.play().catch((error) => {
+        console.error("Video playback failed:", error);
+      });
+    } else {
+      video.pause();
+    }
+  });
+});
+
+function initializeLazyLoading() {
+  const videos = document.querySelectorAll("video");
+  videos.forEach((video) => {
+    observer.observe(video);
+  });
+}
+
 // Refactored initializeGrid function
 function initializeGrid(size) {
   const grid = document.getElementById("videoGrid");
@@ -8,13 +29,16 @@ function initializeGrid(size) {
   const { cols, rows } = window.util.getGridTemplate(size);
   window.grid.setGridStyles(grid, cols, rows);
 
+  const fragment = document.createDocumentFragment();
   for (let i = 0; i < size; i++) {
     const container = window.grid.createVideoContainer(i);
-    grid.appendChild(container);
+    fragment.appendChild(container);
   }
+  grid.appendChild(fragment);
 
   attachHandlers(size);
   attachFullscreenHandlers();
+  initializeLazyLoading(); // Add lazy loading
 }
 
 // Pool input and button logic
@@ -77,6 +101,9 @@ function setVideoSourceAndPlay(video, src) {
 // New helper function to set video source only (no playback)
 function setVideoSource(video, src) {
   if (video && src) {
+    if (video.src) {
+      URL.revokeObjectURL(video.src); // Revoke previous URL
+    }
     video.src = src;
     video.muted = true;
     video.load();
