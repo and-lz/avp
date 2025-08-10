@@ -255,7 +255,7 @@ function addScrubHandler(video) {
     if (video.readyState >= 1 && video.duration) {
       video.currentTime = percent * video.duration;
     }
-  }, 1000);
+  }, 100);
   video.addEventListener("mousemove", throttledScrub);
 }
 
