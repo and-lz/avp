@@ -1,39 +1,18 @@
-// Use helpers from window.dom and window.util
-const APP_CONFIG = {
-  basePath:
-    "/Users/andreluiz/Library/Mobile Documents/com~apple~CloudDocs/avp/",
-  shortcuts: {
-    shuffleVideos: "r",
-  },
-};
+// Removed ES6 import and updated references to use window.grid
 
-let videoPool = [];
-let videoPoolIndex = 0;
-let shuffledVideoPool = [];
-let shownVideos = new Set();
-
-// Replace renderGrid and addScrubHandler calls with imported functions
-// Update other parts of the script to use helper functions from dom.js and grid.js
+// Refactored initializeGrid function
 function initializeGrid(size) {
   const grid = document.getElementById("videoGrid");
   grid.innerHTML = "";
+
   const { cols, rows } = window.util.getGridTemplate(size);
-  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  window.grid.setGridStyles(grid, cols, rows);
+
   for (let i = 0; i < size; i++) {
-    const container = document.createElement("div");
-    container.className = "video-container";
-    const video = document.createElement("video");
-    video.id = `video${i}`;
-    const input = document.createElement("input");
-    input.id = `input${i}`;
-    input.type = "file";
-    input.accept = "video/*";
-    input.multiple = true;
-    container.appendChild(video);
-    container.appendChild(input);
+    const container = window.grid.createVideoContainer(i);
     grid.appendChild(container);
   }
+
   attachHandlers(size);
   attachFullscreenHandlers();
 }
@@ -58,49 +37,63 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Load video file names from local storage
+// Helper function to load videos from local storage
+function loadVideosFromLocalStorage() {
   const savedVideoFileNames = JSON.parse(localStorage.getItem("videoPool"));
   const basePath = APP_CONFIG.basePath;
 
   if (savedVideoFileNames && savedVideoFileNames.length > 0) {
-    // Use cached file names and prefix with base path
-    // Instead of creating File objects, load videos by path
     videoPool = savedVideoFileNames.map((name) => basePath + name);
+    return true;
+  }
+  return false;
+}
+
+// Helper function to set video source and playback
+function setVideoSourceAndPlay(video, src) {
+  video.src = src;
+  video.muted = true;
+  video.load();
+  video.onloadedmetadata = function () {
+    video.currentTime = video.duration * 0.5;
+    video.play().catch((error) => {
+      console.error("Video playback failed:", error);
+    });
+  };
+}
+
+// Refactored DOMContentLoaded logic
+function handleDOMContentLoaded() {
+  if (loadVideosFromLocalStorage()) {
     const gridSize = parseInt(document.getElementById("gridSize").value, 10);
     initializeGrid(gridSize);
+
     for (let i = 0; i < gridSize; i++) {
-      const v = document.getElementById("video" + i);
-      if (savedVideoFileNames[i]) {
-        v.src = basePath + savedVideoFileNames[i];
-        v.muted = true;
-        v.load();
-        v.onloadedmetadata = function () {
-          v.currentTime = v.duration * 0.5;
-          v.play().catch((error) => {
-            console.error("Video playback failed:", error);
-          });
-        };
+      const video = document.getElementById(`video${i}`);
+      const src = videoPool[i];
+      if (src) {
+        setVideoSourceAndPlay(video, src);
       } else {
-        v.src = "";
+        video.src = "";
       }
     }
-    // Play all videos after loading
+
     setTimeout(() => {
       for (let i = 0; i < gridSize; i++) {
-        const v = document.getElementById("video" + i);
-        if (v.src) {
-          v.play().catch((error) => {
+        const video = document.getElementById(`video${i}`);
+        if (video.src) {
+          video.play().catch((error) => {
             console.error("Video playback failed:", error);
           });
         }
       }
     }, 500);
-    console.log(
-      "Videos loaded from local storage file names with base path and all are playing."
-    );
+
+    console.log("Videos loaded from local storage and are playing.");
   }
-});
+}
+
+document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
 
 // Update key event listener to use the 'R' key for changing videos
 document.addEventListener("keydown", function (e) {

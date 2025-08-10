@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="overflow-visible">
+    <script>
+      const APP_CONFIG = {
+        basePath:
+          "/Users/andreluiz/Library/Mobile Documents/com~apple~CloudDocs/avp/",
+        shortcuts: {
+          shuffleVideos: "r",
+        },
+      };
+    </script>
     <div class="fixed-div">
       <label for="gridSize">Grid size:</label>
       <select id="gridSize" onchange="applyVideosFromPool(true)">
@@ -22,8 +31,9 @@
     ></div>
     <input type="file" id="poolInput" accept="video/*" multiple />
     <button id="poolBtn">Select Video Pool</button>
-    <script src="helpers/util.js"></script>
-    <script src="helpers/dom.js"></script>
+    <script src="./helpers/grid.js"></script>
+    <script src="./helpers/dom.js"></script>
+    <script src="./helpers/util.js"></script>
     <script src="scripts.js"></script>
   </body>
 </html>
