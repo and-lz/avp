@@ -177,41 +177,53 @@ document.addEventListener("keydown", function (e) {
   if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
     if (videoPool.length > 0) {
       console.log("Shuffling videos...");
-      // Shuffle pool and pick gridSize videos
-      const shuffled = videoPool.slice().sort(() => Math.random() - 0.5);
+      // Build a set of all videos currently on the grid (including pinned)
+      const currentGridVideos = new Set();
       for (let i = 0; i < gridSize; i++) {
         const v = document.getElementById("video" + i);
-        // Only change if not pinned
+        if (v && v.src) {
+          currentGridVideos.add(v.src);
+        }
+      }
+      // Prepare a pool of videos not currently on the grid
+      const availableVideos = videoPool.filter((src) => {
+        if (src instanceof File || src instanceof Blob) {
+          const url = URL.createObjectURL(src);
+          const found = currentGridVideos.has(url);
+          URL.revokeObjectURL(url);
+          return !found;
+        }
+        return !currentGridVideos.has(src);
+      });
+      // Shuffle available videos
+      const shuffled = availableVideos.sort(() => Math.random() - 0.5);
+      let shuffledIdx = 0;
+      // Fill only unpinned slots with unique videos
+      for (let i = 0; i < gridSize; i++) {
+        const v = document.getElementById("video" + i);
         if (!pinnedVideos[i]) {
-          if (shuffled[i]) {
-            let url;
-            if (shuffled[i] instanceof File || shuffled[i] instanceof Blob) {
-              url = URL.createObjectURL(shuffled[i]);
-            } else if (typeof shuffled[i] === "string") {
-              url = shuffled[i];
-            } else {
-              console.error(
-                "Invalid video file in shuffled pool:",
-                shuffled[i]
-              );
-              v.src = "";
-              continue;
+          let url = "";
+          if (shuffledIdx < shuffled.length) {
+            const candidate = shuffled[shuffledIdx];
+            if (candidate instanceof File || candidate instanceof Blob) {
+              url = URL.createObjectURL(candidate);
+            } else if (typeof candidate === "string") {
+              url = candidate;
             }
-            if (v) {
-              v.src = url;
-              v.muted = true;
-              v.load();
-              v.onloadedmetadata = function () {
-                v.currentTime = v.duration * 0.5;
-                v.play();
-              };
-            } else {
-              console.error("Video element not found for index:", i);
-            }
-          } else {
-            console.error("Invalid video file in shuffled pool:", shuffled[i]);
-            if (v) v.src = "";
+            currentGridVideos.add(url); // Mark as used
           }
+          if (url) {
+            v.src = url;
+            v.muted = true;
+            v.load();
+            v.onloadedmetadata = function () {
+              v.currentTime = v.duration * 0.5;
+              v.play();
+            };
+          } else {
+            v.src = ""; // No unique video available
+          }
+          shuffledIdx++;
         }
       }
     } else {
