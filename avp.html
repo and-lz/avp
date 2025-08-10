@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AVP Project</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="overflow-visible">
+    <div class="fixed-div">
+      <label for="gridSize">Grid size:</label>
+      <select id="gridSize" onchange="applyVideosFromPool()">
+        <option value="4" selected>4</option>
+        <option value="6">6</option>
+        <option value="9">9</option>
+        <option value="12">12</option>
+      </select>
+    </div>
+    <div
+      id="videoGrid"
+      style="width: 100vw; height: 100vh; display: grid; gap: 0"
+    ></div>
+    <input type="file" id="poolInput" accept="video/*" multiple />
+    <button id="poolBtn">Select Video Pool</button>
+    <script src="scripts.js"></script>
+  </body>
+</html>

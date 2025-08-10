@@ -1,0 +1,94 @@
+/* Updated to use CSS nesting */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100dvw;
+  height: 100dvh;
+  overflow: hidden;
+
+  body {
+    width: 100dvw;
+    height: 100dvh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    background: #222;
+    display: block;
+  }
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.fixed-div {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: #222;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #0003;
+
+  label {
+    color: #fff;
+    font-size: 1.1em;
+  }
+
+  select {
+    font-size: 1.1em;
+  }
+}
+
+#videoGrid {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  gap: 0;
+}
+
+#poolInput {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 101;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+#poolBtn {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 102;
+}
