@@ -37,21 +37,11 @@ function initializeGrid(size) {
     pinBtn.className = "pin-btn";
     pinBtn.textContent = "📌";
     pinBtn.title = "Pin/unpin this video";
-    pinBtn.style.position = "absolute";
-    pinBtn.style.top = "8px";
-    pinBtn.style.right = "8px";
-    pinBtn.style.zIndex = "10";
-    pinBtn.style.background = "rgba(255,255,255,0.7)";
-    pinBtn.style.border = "none";
-    pinBtn.style.cursor = "pointer";
-    pinBtn.style.fontSize = "20px";
     pinBtn.dataset.pinned = pinnedVideos[i] ? "true" : "false";
-    pinBtn.style.opacity = pinnedVideos[i] ? "1" : "0.5";
     pinBtn.addEventListener("click", function (e) {
       e.stopPropagation();
       const idx = i;
       pinnedVideos[idx] = !pinnedVideos[idx];
-      pinBtn.style.opacity = pinnedVideos[idx] ? "1" : "0.5";
       pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
     });
     container.style.position = "relative";
