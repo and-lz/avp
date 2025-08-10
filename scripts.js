@@ -217,6 +217,20 @@ document.addEventListener("keydown", function (e) {
     } else {
       console.log("Video pool is empty. Cannot shuffle videos.");
     }
+  } else if (e.key === "p" || e.key === "P") {
+    const hovered = document.querySelector("video:hover");
+    if (hovered) {
+      const idMatch = hovered.id.match(/video(\d+)/);
+      if (idMatch) {
+        const idx = parseInt(idMatch[1], 10);
+        pinnedVideos[idx] = !pinnedVideos[idx];
+        // Update pin button state
+        const pinBtn = hovered.parentElement.querySelector(".pin-btn");
+        if (pinBtn) {
+          pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
+        }
+      }
+    }
   }
 });
 

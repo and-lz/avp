@@ -107,8 +107,9 @@ input[type="file"] {
   border-radius: 100%;
 }
 .pin-btn[data-pinned="true"] {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.4);
 }
 .pin-btn[data-pinned="false"] {
   background: rgba(0, 0, 0, 0.2);
+  opacity: 0;
 }
