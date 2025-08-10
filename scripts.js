@@ -45,14 +45,15 @@ function initializeGrid(size) {
     pinBtn.style.border = "none";
     pinBtn.style.cursor = "pointer";
     pinBtn.style.fontSize = "20px";
-    pinBtn.dataset.pinned = "false";
+    pinBtn.dataset.pinned = pinnedVideos[i] ? "true" : "false";
+    pinBtn.style.opacity = pinnedVideos[i] ? "1" : "0.5";
     pinBtn.addEventListener("click", function (e) {
       e.stopPropagation();
       const idx = i;
       pinnedVideos[idx] = !pinnedVideos[idx];
       pinBtn.style.opacity = pinnedVideos[idx] ? "1" : "0.5";
+      pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
     });
-    pinBtn.style.opacity = "0.5";
     container.style.position = "relative";
     container.appendChild(pinBtn);
     fragment.appendChild(container);
@@ -288,11 +289,21 @@ document.addEventListener("keydown", function (e) {
     }
   } else if (e.key === "+" || e.key === "=") {
     gridSize += 1;
+    // Preserve pin state and add new unpinned slot
+    if (pinnedVideos.length < gridSize) {
+      pinnedVideos.length = gridSize;
+      for (let i = 0; i < gridSize; i++) {
+        if (typeof pinnedVideos[i] !== "boolean") pinnedVideos[i] = false;
+      }
+    }
     initializeGrid(gridSize);
-    // Re-apply videos from pool immediately
     for (let i = 0; i < gridSize; i++) {
       const video = document.getElementById(`video${i}`);
       let src = "";
+      if (pinnedVideos[i] && video.src) {
+        // Keep pinned video as is
+        continue;
+      }
       if (videoPool[i]) {
         if (videoPool[i] instanceof File) {
           src = URL.createObjectURL(videoPool[i]);
@@ -309,11 +320,16 @@ document.addEventListener("keydown", function (e) {
   } else if (e.key === "-" || e.key === "_" || e.key === "–") {
     if (gridSize > 1) {
       gridSize -= 1;
-      if (gridSize < 1) gridSize = 1;
+      // Trim pin state
+      pinnedVideos.length = gridSize;
       initializeGrid(gridSize);
       for (let i = 0; i < gridSize; i++) {
         const video = document.getElementById(`video${i}`);
         let src = "";
+        if (pinnedVideos[i] && video.src) {
+          // Keep pinned video as is
+          continue;
+        }
         if (videoPool[i]) {
           if (videoPool[i] instanceof File) {
             src = URL.createObjectURL(videoPool[i]);
