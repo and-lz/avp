@@ -11,11 +11,8 @@ function throttle(fn, wait) {
 }
 
 function getGridTemplate(size) {
-  if (size === 4) return { cols: 2, rows: 2 };
-  if (size === 6) return { cols: 3, rows: 2 };
-  if (size === 9) return { cols: 3, rows: 3 };
-  if (size === 12) return { cols: 4, rows: 3 };
-  return { cols: 3, rows: 2 };
+  // Dynamically calculate columns for a roughly square grid
+  return { cols: Math.ceil(Math.sqrt(size)) };
 }
 
 function debounce(fn, delay) {

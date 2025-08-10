@@ -59,9 +59,13 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
     localStorage.setItem("videoPoolPaths", JSON.stringify(videoFilePaths));
     console.log("Saved video file paths to localStorage:", videoFilePaths);
 
-    // Refresh the grid with new video options
-    initializeGrid(gridSize);
-    for (let i = 0; i < gridSize; i++) {
+    // Refresh the grid with new video options using the selected grid size
+    const selectedGridSize = parseInt(
+      document.getElementById("gridSize").value,
+      10
+    );
+    initializeGrid(selectedGridSize);
+    for (let i = 0; i < selectedGridSize; i++) {
       const video = document.getElementById(`video${i}`);
       const src = videoPool[i] ? URL.createObjectURL(videoPool[i]) : "";
       if (src) {
