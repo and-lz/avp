@@ -34,6 +34,18 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
     );
     localStorage.setItem("videoPoolPaths", JSON.stringify(videoFilePaths));
     console.log("Saved video file paths to localStorage:", videoFilePaths);
+
+    // Refresh the grid with new video options
+    initializeGrid(gridSize);
+    for (let i = 0; i < gridSize; i++) {
+      const video = document.getElementById(`video${i}`);
+      const src = videoPool[i] ? URL.createObjectURL(videoPool[i]) : "";
+      if (src) {
+        setVideoSourceAndPlay(video, src);
+      } else {
+        video.src = "";
+      }
+    }
   }
 });
 
