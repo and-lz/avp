@@ -104,12 +104,12 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
 document.addEventListener("DOMContentLoaded", () => {
   // Load video file names from local storage
   const savedVideoFileNames = JSON.parse(localStorage.getItem("videoPool"));
-  const basePath =
-    "/Users/andreluiz/Library/Mobile Documents/com~apple~CloudDocs/avp/";
+  const basePath = APP_CONFIG.basePath;
 
   if (savedVideoFileNames && savedVideoFileNames.length > 0) {
     // Use cached file names and prefix with base path
-    videoPool = savedVideoFileNames.map((name) => new File([], name)); // Simulate file picking
+    // Instead of creating File objects, load videos by path
+    videoPool = savedVideoFileNames.map((name) => basePath + name);
     const gridSize = parseInt(document.getElementById("gridSize").value, 10);
     initializeGrid(gridSize);
     for (let i = 0; i < gridSize; i++) {
@@ -120,7 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
         v.load();
         v.onloadedmetadata = function () {
           v.currentTime = v.duration * 0.5;
-          v.play();
+          v.play().catch((error) => {
+            console.error("Video playback failed:", error);
+          });
         };
       } else {
         v.src = "";
@@ -131,7 +133,9 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let i = 0; i < gridSize; i++) {
         const v = document.getElementById("video" + i);
         if (v.src) {
-          v.play();
+          v.play().catch((error) => {
+            console.error("Video playback failed:", error);
+          });
         }
       }
     }, 500);
@@ -290,13 +294,15 @@ function setFullscreenVideoStyles(video) {
   video.style.backgroundColor = "#000";
 }
 
-function applyVideosFromPool() {
+function applyVideosFromPool(forceReload = false) {
   const gridSize = parseInt(document.getElementById("gridSize").value, 10);
   initializeGrid(gridSize);
+  videoPoolIndex = 0; // Reset index when grid size changes
 
   if (videoPool.length > 0) {
     // Shuffle pool only once if not already shuffled or if all videos have been shown
     if (
+      forceReload ||
       shuffledVideoPool.length === 0 ||
       shownVideos.size >= videoPool.length
     ) {
@@ -308,24 +314,25 @@ function applyVideosFromPool() {
       const v = document.getElementById("video" + i);
 
       // Find the next video that hasn't been shown yet
-      let file;
+      let filePath;
       while (videoPoolIndex < shuffledVideoPool.length) {
-        file = shuffledVideoPool[videoPoolIndex];
+        filePath = shuffledVideoPool[videoPoolIndex];
         videoPoolIndex++;
-        if (!shownVideos.has(file)) {
-          shownVideos.add(file);
+        if (!shownVideos.has(filePath)) {
+          shownVideos.add(filePath);
           break;
         }
       }
 
-      if (file) {
-        const url = URL.createObjectURL(file);
-        v.src = url;
+      if (filePath) {
+        v.src = filePath;
         v.muted = true;
         v.load();
         v.onloadedmetadata = function () {
           v.currentTime = v.duration * 0.5;
-          v.play();
+          v.play().catch((error) => {
+            console.error("Video playback failed:", error);
+          });
         };
       } else {
         v.src = "";
