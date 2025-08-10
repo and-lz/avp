@@ -291,3 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// Declared the missing shownVideos variable as a Set to fix the ReferenceError.
+let shownVideos = new Set();
