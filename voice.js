@@ -95,17 +95,6 @@ if (
     }
   }
 
-  // Add a button to toggle speech recognition
-  const toggleButton = document.createElement("button");
-  toggleButton.textContent = "Toggle Speech Recognition";
-  toggleButton.style.position = "fixed";
-  toggleButton.style.bottom = "50px";
-  toggleButton.style.left = "50%";
-  toggleButton.style.transform = "translateX(-50%)";
-  toggleButton.style.zIndex = "1000";
-  toggleButton.addEventListener("click", toggleSpeechRecognition);
-  document.body.appendChild(toggleButton);
-
   // Start listening
   recognition.start();
 }
