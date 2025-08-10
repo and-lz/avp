@@ -1,5 +1,5 @@
 // Voice Command Script
-// This script listens for the user to say "change" and simulates pressing the 'R' key.
+// This script listens for the user to say "go" and simulates pressing the 'R' key.
 
 // Check for browser support
 if (
@@ -18,46 +18,48 @@ if (
   recognition.lang = "en-US";
   recognition.interimResults = true; // Enable interim results for faster detection
 
-  let lastCommandTime = 0; // To debounce commands
-  const CONFIDENCE_THRESHOLD = 0.8; // Minimum confidence level
-
   let isRecognitionActive = false;
 
   recognition.onresult = function (event) {
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const command = event.results[i][0].transcript.trim().toLowerCase();
-      const confidence = event.results[i][0].confidence;
-      console.log("Heard command:", command, "with confidence:", confidence);
+      console.log("Heard command:", command);
+
+      console.debug(
+        "Processing command:",
+        command,
+        "| Is Final:",
+        event.results[i].isFinal
+      );
 
       if (
-        confidence >= CONFIDENCE_THRESHOLD &&
         event.results[i].isFinal &&
-        command === "change"
+        (command === "go" || command.includes("go")) // Match command
       ) {
-        const now = Date.now();
-        if (now - lastCommandTime > 2000) {
-          // Debounce: 2 seconds
-          lastCommandTime = now;
+        // Simulate pressing the 'R' key
+        const event = new KeyboardEvent("keydown", { key: "r" });
+        document.dispatchEvent(event);
 
-          // Simulate pressing the 'R' key
-          const event = new KeyboardEvent("keydown", { key: "r" });
-          document.dispatchEvent(event);
+        // Show a toast notification
+        const toast = document.createElement("div");
+        toast.textContent = 'Command "go" detected!';
+        toast.style.position = "fixed";
+        toast.style.bottom = "20px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.backgroundColor = "#333";
+        toast.style.color = "#fff";
+        toast.style.padding = "10px 20px";
+        toast.style.borderRadius = "5px";
+        toast.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.3)";
+        toast.style.zIndex = "1000";
+        document.body.appendChild(toast);
+        setTimeout(() => document.body.removeChild(toast), 3000);
 
-          // Show a toast notification
-          const toast = document.createElement("div");
-          toast.textContent = 'Command "change" detected!';
-          toast.style.position = "fixed";
-          toast.style.bottom = "20px";
-          toast.style.left = "50%";
-          toast.style.transform = "translateX(-50%)";
-          toast.style.backgroundColor = "#333";
-          toast.style.color = "#fff";
-          toast.style.padding = "10px 20px";
-          toast.style.borderRadius = "5px";
-          toast.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.3)";
-          toast.style.zIndex = "1000";
-          document.body.appendChild(toast);
-          setTimeout(() => document.body.removeChild(toast), 3000);
+        // Restart recognition after processing a command
+        if (isRecognitionActive) {
+          recognition.stop();
+          setTimeout(() => recognition.start(), 500); // Restart after a short delay
         }
       }
     }
@@ -77,10 +79,15 @@ if (
     // Removed micIndicator display logic
   };
 
+  recognition.onspeechend = function () {
+    console.log("Speech ended, but recognition is still active.");
+  };
+
   recognition.onend = function () {
-    // Removed micIndicator display logic
     console.log("Speech recognition ended. Restarting...");
-    recognition.start(); // Restart recognition
+    if (isRecognitionActive) {
+      setTimeout(() => recognition.start(), 1000); // Restart after a delay
+    }
   };
 
   function toggleSpeechRecognition() {
