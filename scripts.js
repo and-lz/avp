@@ -251,7 +251,11 @@ document.addEventListener("keydown", function (e) {
     // Re-apply videos from pool immediately
     for (let i = 0; i < gridSize; i++) {
       const video = document.getElementById(`video${i}`);
-      const src = videoPool[i] ? (videoPool[i] instanceof File ? URL.createObjectURL(videoPool[i]) : videoPool[i]) : "";
+      const src = videoPool[i]
+        ? videoPool[i] instanceof File
+          ? URL.createObjectURL(videoPool[i])
+          : videoPool[i]
+        : "";
       if (src) {
         setVideoSourceAndPlay(video, src);
       } else {
@@ -265,7 +269,11 @@ document.addEventListener("keydown", function (e) {
       initializeGrid(gridSize);
       for (let i = 0; i < gridSize; i++) {
         const video = document.getElementById(`video${i}`);
-        const src = videoPool[i] ? (videoPool[i] instanceof File ? URL.createObjectURL(videoPool[i]) : videoPool[i]) : "";
+        const src = videoPool[i]
+          ? videoPool[i] instanceof File
+            ? URL.createObjectURL(videoPool[i])
+            : videoPool[i]
+          : "";
         if (src) {
           setVideoSourceAndPlay(video, src);
         } else {
