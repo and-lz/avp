@@ -32,6 +32,29 @@ function initializeGrid(size) {
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < size; i++) {
     const container = window.grid.createVideoContainer(i);
+    // Add pin button overlay
+    const pinBtn = document.createElement("button");
+    pinBtn.className = "pin-btn";
+    pinBtn.textContent = "📌";
+    pinBtn.title = "Pin/unpin this video";
+    pinBtn.style.position = "absolute";
+    pinBtn.style.top = "8px";
+    pinBtn.style.right = "8px";
+    pinBtn.style.zIndex = "10";
+    pinBtn.style.background = "rgba(255,255,255,0.7)";
+    pinBtn.style.border = "none";
+    pinBtn.style.cursor = "pointer";
+    pinBtn.style.fontSize = "20px";
+    pinBtn.dataset.pinned = "false";
+    pinBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      const idx = i;
+      pinnedVideos[idx] = !pinnedVideos[idx];
+      pinBtn.style.opacity = pinnedVideos[idx] ? "1" : "0.5";
+    });
+    pinBtn.style.opacity = "0.5";
+    container.style.position = "relative";
+    container.appendChild(pinBtn);
     fragment.appendChild(container);
   }
   grid.appendChild(fragment);
@@ -167,33 +190,37 @@ document.addEventListener("keydown", function (e) {
       const shuffled = videoPool.slice().sort(() => Math.random() - 0.5);
       for (let i = 0; i < gridSize; i++) {
         const v = document.getElementById("video" + i);
-        if (shuffled[i]) {
-          let url;
-          if (shuffled[i] instanceof File || shuffled[i] instanceof Blob) {
-            url = URL.createObjectURL(shuffled[i]);
-          } else if (typeof shuffled[i] === "string") {
-            // Assume it's a file path and use it directly
-            url = shuffled[i];
+        // Only change if not pinned
+        if (!pinnedVideos[i]) {
+          if (shuffled[i]) {
+            let url;
+            if (shuffled[i] instanceof File || shuffled[i] instanceof Blob) {
+              url = URL.createObjectURL(shuffled[i]);
+            } else if (typeof shuffled[i] === "string") {
+              url = shuffled[i];
+            } else {
+              console.error(
+                "Invalid video file in shuffled pool:",
+                shuffled[i]
+              );
+              v.src = "";
+              continue;
+            }
+            if (v) {
+              v.src = url;
+              v.muted = true;
+              v.load();
+              v.onloadedmetadata = function () {
+                v.currentTime = v.duration * 0.5;
+                v.play();
+              };
+            } else {
+              console.error("Video element not found for index:", i);
+            }
           } else {
             console.error("Invalid video file in shuffled pool:", shuffled[i]);
-            v.src = "";
-            continue;
+            if (v) v.src = "";
           }
-
-          if (v) {
-            v.src = url;
-            v.muted = true;
-            v.load();
-            v.onloadedmetadata = function () {
-              v.currentTime = v.duration * 0.5;
-              v.play();
-            };
-          } else {
-            console.error("Video element not found for index:", i);
-          }
-        } else {
-          console.error("Invalid video file in shuffled pool:", shuffled[i]);
-          if (v) v.src = "";
         }
       }
     } else {
@@ -241,6 +268,7 @@ function attachHandlers(size) {
 
 // Initial grid size
 let gridSize = 6;
+let pinnedVideos = [];
 initializeGrid(gridSize);
 
 // Keyboard controls for grid size
@@ -264,11 +292,14 @@ document.addEventListener("keydown", function (e) {
     // Re-apply videos from pool immediately
     for (let i = 0; i < gridSize; i++) {
       const video = document.getElementById(`video${i}`);
-      const src = videoPool[i]
-        ? videoPool[i] instanceof File
-          ? URL.createObjectURL(videoPool[i])
-          : videoPool[i]
-        : "";
+      let src = "";
+      if (videoPool[i]) {
+        if (videoPool[i] instanceof File) {
+          src = URL.createObjectURL(videoPool[i]);
+        } else {
+          src = videoPool[i];
+        }
+      }
       if (src) {
         setVideoSourceAndPlay(video, src);
       } else {
@@ -282,11 +313,14 @@ document.addEventListener("keydown", function (e) {
       initializeGrid(gridSize);
       for (let i = 0; i < gridSize; i++) {
         const video = document.getElementById(`video${i}`);
-        const src = videoPool[i]
-          ? videoPool[i] instanceof File
-            ? URL.createObjectURL(videoPool[i])
-            : videoPool[i]
-          : "";
+        let src = "";
+        if (videoPool[i]) {
+          if (videoPool[i] instanceof File) {
+            src = URL.createObjectURL(videoPool[i]);
+          } else {
+            src = videoPool[i];
+          }
+        }
         if (src) {
           setVideoSourceAndPlay(video, src);
         } else {
