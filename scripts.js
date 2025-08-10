@@ -198,16 +198,14 @@ function attachFullscreenHandlers() {
         }
       });
 
-      video.requestFullscreen().catch((error) => {
-        console.error("Error attempting to enable fullscreen mode:", error);
-      });
+      // Apply fullscreen styles to the clicked video
+      window.dom.toggleVideoStyles(video, true);
 
       video.addEventListener(
         "click",
         function exitFullscreenHandler() {
-          document.exitFullscreen().catch((error) => {
-            console.error("Error exiting fullscreen mode:", error);
-          });
+          // Reset styles
+          window.dom.toggleVideoStyles(video, false);
 
           // Play all videos again
           videos.forEach((v) => {
@@ -282,17 +280,13 @@ document.addEventListener("DOMContentLoaded", () => {
   videos.forEach((video) => {
     // Add fullscreen behavior on click
     video.addEventListener("click", () => {
-      video.requestFullscreen().catch((error) => {
-        console.error("Error attempting to enable fullscreen mode:", error);
-      });
+      video.classList.add("fullscreen");
 
       // Exit fullscreen on second click
       video.addEventListener(
         "click",
         () => {
-          document.exitFullscreen().catch((error) => {
-            console.error("Error exiting fullscreen mode:", error);
-          });
+          video.classList.remove("fullscreen");
         },
         { once: true }
       );
