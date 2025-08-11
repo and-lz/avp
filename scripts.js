@@ -1,3 +1,37 @@
+// Utility: Get a unique key for a video source
+function getVideoKey(src) {
+  if (src instanceof File) return src.name;
+  if (src instanceof Blob && src.name) return src.name;
+  if (typeof src === "string") return src;
+  return String(src);
+}
+
+// Utility: Set video source and optionally play
+function setVideoSource(video, src, play = true) {
+  if (video && src) {
+    if (video.src) {
+      URL.revokeObjectURL(video.src);
+    }
+    video.src = src;
+    video.muted = true;
+    video.load();
+    video.onloadedmetadata = function () {
+      video.currentTime = video.duration * 0.5;
+      if (play) {
+        video.play().catch((error) => {
+          console.error("Video playback failed:", error);
+        });
+      }
+    };
+  } else if (video) {
+    video.src = "";
+  }
+}
+
+// Utility: Shuffle array
+function shuffleArray(arr) {
+  return arr.slice().sort(() => Math.random() - 0.5);
+}
 // Removed ES6 import and updated references to use window.grid
 let shownVideos = new Set();
 // Declared the missing shownVideos variable as a Set to fix the ReferenceError.
@@ -19,11 +53,65 @@ function stopAutoShuffle() {
   }
 }
 function shuffleVideosOnGrid() {
-  // Simulate pressing the shuffle shortcut key
-  const event = new KeyboardEvent("keydown", {
-    key: APP_CONFIG.shortcuts.shuffleVideos,
+  // Directly shuffle videos on grid, respecting pin state
+  if (videoPool.length === 0) {
+    console.log("Video pool is empty. Cannot shuffle videos.");
+    return;
+  }
+  const currentGridVideos = new Set();
+  for (let i = 0; i < gridSize; i++) {
+    const v = document.getElementById("video" + i);
+    if (v && v.src) {
+      currentGridVideos.add(v.src);
+    }
+  }
+  let availableVideos = videoPool.filter((src) => {
+    const key = getVideoKey(src);
+    let onGrid = false;
+    for (let vSrc of currentGridVideos) {
+      if (vSrc.includes(key)) {
+        onGrid = true;
+        break;
+      }
+    }
+    return !onGrid && !shownVideos.has(key);
   });
-  document.dispatchEvent(event);
+  if (availableVideos.length === 0) {
+    shownVideos.clear();
+    availableVideos = videoPool.filter((src) => {
+      const key = getVideoKey(src);
+      let onGrid = false;
+      for (let vSrc of currentGridVideos) {
+        if (vSrc.includes(key)) {
+          onGrid = true;
+          break;
+        }
+      }
+      return !onGrid;
+    });
+  }
+  const shuffled = shuffleArray(availableVideos);
+  let shuffledIdx = 0;
+  for (let i = 0; i < gridSize; i++) {
+    const v = document.getElementById("video" + i);
+    if (!pinnedVideos[i]) {
+      let url = "";
+      let key = "";
+      if (shuffledIdx < shuffled.length) {
+        const candidate = shuffled[shuffledIdx];
+        key = getVideoKey(candidate);
+        if (candidate instanceof File || candidate instanceof Blob) {
+          url = URL.createObjectURL(candidate);
+        } else if (typeof candidate === "string") {
+          url = candidate;
+        }
+        currentGridVideos.add(url);
+        shownVideos.add(key);
+      }
+      setVideoSource(v, url);
+      shuffledIdx++;
+    }
+  }
 }
 
 // Refactored initializeGrid function
@@ -57,7 +145,7 @@ function initializeGrid(size) {
 
   attachHandlers(size);
   attachFullscreenHandlers();
-  initializeLazyLoading(); // Add lazy loading
+  // initializeLazyLoading(); // Add lazy loading (function not defined)
 }
 
 // Pool input and button logic
@@ -110,19 +198,12 @@ function loadVideosFromLocalStorage() {
 
 // Helper function to set video source and playback
 function setVideoSourceAndPlay(video, src) {
-  video.src = src;
-  video.muted = true;
-  video.load();
-  video.onloadedmetadata = function () {
-    video.currentTime = video.duration * 0.5;
-    video.play().catch((error) => {
-      console.error("Video playback failed:", error);
-    });
-  };
+  setVideoSource(video, src, true);
 }
 
 // New helper function to set video source only (no playback)
-function setVideoSource(video, src) {
+// Helper function to set video source only (no playback)
+function setVideoSource(video, src, play = true) {
   if (video && src) {
     if (video.src) {
       URL.revokeObjectURL(video.src); // Revoke previous URL
@@ -132,9 +213,11 @@ function setVideoSource(video, src) {
     video.load();
     video.onloadedmetadata = function () {
       video.currentTime = video.duration * 0.5;
-      video.play().catch((error) => {
-        console.error("Video playback failed:", error);
-      });
+      if (play) {
+        video.play().catch((error) => {
+          console.error("Video playback failed:", error);
+        });
+      }
     };
   } else if (video) {
     video.src = "";
@@ -149,12 +232,8 @@ function handleDOMContentLoaded() {
 
     for (let i = 0; i < gridSize; i++) {
       const video = document.getElementById(`video${i}`);
-      const src = videoPool[i];
-      if (src) {
-        setVideoSourceAndPlay(video, src);
-      } else {
-        video.src = "";
-      }
+      const src = videoPool[i] || "";
+      setVideoSource(video, src, true);
     }
 
     setTimeout(() => {
