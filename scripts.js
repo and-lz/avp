@@ -174,6 +174,26 @@ document.addEventListener("keydown", function (e) {
   console.log("Key pressed:", e.key);
   console.log("Video pool length:", videoPool.length);
 
+  // Toggle play/pause for all videos on space bar
+  if (e.code === "Space") {
+    e.preventDefault();
+    const videos = document.querySelectorAll("video");
+    let anyPlaying = false;
+    videos.forEach((video) => {
+      if (!video.paused && !video.ended) {
+        anyPlaying = true;
+      }
+    });
+    videos.forEach((video) => {
+      if (anyPlaying) {
+        video.pause();
+      } else {
+        video.play().catch(() => {});
+      }
+    });
+    return;
+  }
+
   if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
     if (videoPool.length > 0) {
       console.log("Shuffling videos...");
