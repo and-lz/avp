@@ -20,17 +20,20 @@ function getCurrentGridVideos(gridSize) {
 }
 
 function getAvailableVideos(currentGridVideos) {
+  const videoPool = window.videoGridManager?.videoPool || [];
   return videoPool.filter((src) => {
     const key = window.videoUtil.getVideoKey(src);
     for (let vSrc of currentGridVideos) {
       if (vSrc.includes(key)) return false;
     }
+    const shownVideos = window.videoGridManager?.shownVideos || new Set();
     if (shownVideos.has(key)) return false;
     return true;
   });
 }
 
 function getFallbackVideos(currentGridVideos) {
+  const videoPool = window.videoGridManager?.videoPool || [];
   return videoPool.filter((src) => {
     const key = window.videoUtil.getVideoKey(src);
     for (let vSrc of currentGridVideos) {
@@ -42,9 +45,10 @@ function getFallbackVideos(currentGridVideos) {
 
 function setGridVideos(shuffled, currentGridVideos) {
   let shuffledIdx = 0;
+  const gridSize = window.videoGridManager?.gridSize || 4;
   for (let i = 0; i < gridSize; i++) {
     const v = document.getElementById("video" + i);
-    if (pinnedVideos[i]) continue;
+    if (window.videoGridManager?.pinnedVideos[i]) continue;
     let url = "";
     let key = "";
     if (shuffledIdx < shuffled.length) {
@@ -56,6 +60,7 @@ function setGridVideos(shuffled, currentGridVideos) {
         url = candidate;
       }
       currentGridVideos.add(url);
+      const shownVideos = window.videoGridManager?.shownVideos || new Set();
       shownVideos.add(key);
     }
     window.videoUtil.setVideoSource(v, url);
@@ -64,6 +69,8 @@ function setGridVideos(shuffled, currentGridVideos) {
 }
 
 function shuffleVideosOnGrid() {
+  const videoPool = window.videoGridManager?.videoPool || [];
+  const gridSize = window.videoGridManager?.gridSize || 4;
   if (videoPool.length === 0) {
     console.log("Video pool is empty. Cannot shuffle videos.");
     return;
@@ -75,11 +82,14 @@ function shuffleVideosOnGrid() {
     setGridVideos(shuffled, currentGridVideos);
     return;
   }
+  const shownVideos = window.videoGridManager?.shownVideos || new Set();
   shownVideos.clear();
   availableVideos = getFallbackVideos(currentGridVideos);
   const shuffled = window.videoUtil.shuffleArray(availableVideos);
   setGridVideos(shuffled, currentGridVideos);
 }
+
+window.shuffleVideosOnGrid = shuffleVideosOnGrid;
 
 function attachHandlers(gridSize) {
   Array.from({ length: gridSize }).forEach((_, i) => {
@@ -101,11 +111,18 @@ function createPinButton(i) {
   pinBtn.className = "pin-btn";
   pinBtn.textContent = "📌";
   pinBtn.title = "Pin/unpin this video";
-  pinBtn.dataset.pinned = pinnedVideos[i] ? "true" : "false";
+  pinBtn.dataset.pinned = window.videoGridManager?.pinnedVideos[i]
+    ? "true"
+    : "false";
   pinBtn.addEventListener("click", function (e) {
     e.stopPropagation();
-    pinnedVideos[i] = !pinnedVideos[i];
-    pinBtn.dataset.pinned = pinnedVideos[i] ? "true" : "false";
+    if (window.videoGridManager) {
+      window.videoGridManager.pinnedVideos[i] =
+        !window.videoGridManager.pinnedVideos[i];
+      pinBtn.dataset.pinned = window.videoGridManager.pinnedVideos[i]
+        ? "true"
+        : "false";
+    }
   });
   return pinBtn;
 }

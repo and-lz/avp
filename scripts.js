@@ -1,186 +1,202 @@
-// Initial grid size
-window.gridSize = 4;
-window.pinnedVideos = [];
-window.shownVideos = new Set();
-window.videoPool = [];
-initializeGrid(window.gridSize);
-
-// Pool input and button logic
-document.getElementById("poolBtn").addEventListener("click", function () {
-  document.getElementById("poolInput").click();
-});
-
-document.getElementById("poolInput").addEventListener("change", function (e) {
-  videoPool = Array.from(e.target.files);
-  if (videoPool.length === 0) {
-    console.log("No videos selected for pool.");
-    return;
+class VideoGridManager {
+  constructor(gridSize = 4) {
+    this.gridSize = gridSize;
+    this.pinnedVideos = [];
+    this.shownVideos = new Set();
+    this.videoPool = [];
+    this.autoShuffleInterval = null;
+    this.init();
   }
 
-  // Refresh the grid with new video options using the selected grid size
-  const selectedGridSize = parseInt(
-    document.getElementById("gridSize").value,
-    10
-  );
-  initializeGrid(selectedGridSize);
-  for (let i = 0; i < selectedGridSize; i++) {
-    const video = document.getElementById(`video${i}`);
-    const src = videoPool[i] ? URL.createObjectURL(videoPool[i]) : "";
-    if (src) {
-      window.videoUtil.setVideoSource(video, src, true);
-    } else {
-      video.src = "";
-    }
-  }
-});
-
-// Update key event listener to use the 'R' key for changing videos
-document.addEventListener("keydown", function (e) {
-  console.log("Key pressed:", e.key);
-  console.log("Video pool length:", videoPool.length);
-
-  // Toggle auto-shuffle on 'L' key
-  if (e.key === "l") {
-    if (autoShuffleInterval) {
-      stopAutoShuffle();
-    } else {
-      startAutoShuffle();
-    }
-    return;
-  }
-
-  // Toggle play/pause for all videos on space bar
-  if (e.code === "Space") {
-    e.preventDefault();
-    const videos = document.querySelectorAll("video");
-    let anyPlaying = false;
-    videos.forEach((video) => {
-      if (!video.paused && !video.ended) {
-        anyPlaying = true;
-      }
+  init() {
+    this.initializeGrid(this.gridSize);
+    document.getElementById("poolBtn").addEventListener("click", () => {
+      document.getElementById("poolInput").click();
     });
-    videos.forEach((video) => {
-      if (anyPlaying) {
-        video.pause();
-      } else {
-        video.play().catch(() => {});
-      }
-    });
-    return;
+    document
+      .getElementById("poolInput")
+      .addEventListener("change", (e) => this.handlePoolInput(e));
+    document.addEventListener("keydown", (e) => this.handleKeydown(e));
+    document
+      .getElementById("gridSize")
+      .addEventListener("change", window.videoUtil.applyVideosFromPool);
+    this.attachFullscreenClickHandlers();
   }
 
-  if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
-    window.shuffleVideosOnGrid();
-    return;
-  }
-
-  if (e.key === "p") {
-    const hovered = document.querySelector("video:hover");
-    if (!hovered) return;
-
-    const idMatch = hovered.id.match(/video(\d+)/);
-    if (!idMatch) return;
-    const idx = parseInt(idMatch[1], 10);
-    pinnedVideos[idx] = !pinnedVideos[idx];
-
-    // Update pin button state
-    const pinBtn = hovered.parentElement.querySelector(".pin-btn");
-    if (!pinBtn) return;
-    pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
-  }
-
-  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-    // Seek only the video being hovered
-    const hovered = document.querySelector("video:hover");
-    if (!hovered || isNaN(hovered.duration)) return;
-    if (e.key === "ArrowLeft") {
-      hovered.currentTime = Math.max(0, hovered.currentTime - 5);
+  handlePoolInput(e) {
+    this.videoPool = Array.from(e.target.files);
+    if (this.videoPool.length === 0) {
+      console.log("No videos selected for pool.");
       return;
     }
-    hovered.currentTime = Math.min(hovered.duration, hovered.currentTime + 5);
-    return;
-  }
-
-  if (e.key === "+" || e.key === "=") {
-    gridSize += 1;
-    // Preserve pin state and add new unpinned slot
-    if (pinnedVideos.length < gridSize) {
-      pinnedVideos.length = gridSize;
-      for (let i = 0; i < gridSize; i++) {
-        if (typeof pinnedVideos[i] !== "boolean") pinnedVideos[i] = false;
-      }
-    }
-    initializeGrid(gridSize);
-    for (let i = 0; i < gridSize; i++) {
-      const video = document.getElementById(`video${i}`);
-      let src = "";
-      if (pinnedVideos[i] && video.src) {
-        // Keep pinned video as is
-        continue;
-      }
-      if (videoPool[i]) {
-        if (videoPool[i] instanceof File) {
-          src = URL.createObjectURL(videoPool[i]);
-        } else {
-          src = videoPool[i];
-        }
-      }
-      if (src) {
-        window.videoUtil.setVideoSource(video, src, true);
-      } else {
-        video.src = "";
-      }
-    }
-    return;
-  }
-
-  if (e.key === "-" || e.key === "_" || e.key === "–") {
-    if (gridSize <= 1) return;
-    gridSize -= 1;
-    // Trim pin state
-    pinnedVideos.length = gridSize;
-    initializeGrid(gridSize);
-    for (let i = 0; i < gridSize; i++) {
-      const video = document.getElementById(`video${i}`);
-      let src = "";
-      if (pinnedVideos[i] && video.src) {
-        // Keep pinned video as is
-        continue;
-      }
-      if (videoPool[i]) {
-        if (videoPool[i] instanceof File) {
-          src = URL.createObjectURL(videoPool[i]);
-        } else {
-          src = videoPool[i];
-        }
-      }
-      if (src) {
-        window.videoUtil.setVideoSource(video, src, true);
-      } else {
-        video.src = "";
-      }
-    }
-    return;
-  }
-});
-
-document
-  .getElementById("gridSize")
-  .addEventListener("change", window.videoUtil.applyVideosFromPool);
-
-const videos = document.querySelectorAll("video");
-videos.forEach((video) => {
-  // Add fullscreen behavior on click
-  video.addEventListener("click", () => {
-    video.classList.add("fullscreen");
-
-    // Exit fullscreen on second click
-    video.addEventListener(
-      "click",
-      () => {
-        video.classList.remove("fullscreen");
-      },
-      { once: true }
+    const selectedGridSize = parseInt(
+      document.getElementById("gridSize").value,
+      10
     );
-  });
-});
+    this.gridSize = selectedGridSize;
+    this.initializeGrid(this.gridSize);
+    for (let i = 0; i < this.gridSize; i++) {
+      const video = document.getElementById(`video${i}`);
+      const src = this.videoPool[i]
+        ? URL.createObjectURL(this.videoPool[i])
+        : "";
+      if (src) {
+        window.videoUtil.setVideoSource(video, src, true);
+      } else {
+        video.src = "";
+      }
+    }
+  }
+
+  handleKeydown(e) {
+    console.log("Key pressed:", e.key);
+    console.log("Video pool length:", this.videoPool.length);
+    // Toggle auto-shuffle on 'L' key
+    if (e.key === "l") {
+      if (this.autoShuffleInterval) {
+        this.stopAutoShuffle();
+      } else {
+        this.startAutoShuffle();
+      }
+      return;
+    }
+    // Toggle play/pause for all videos on space bar
+    if (e.code === "Space") {
+      e.preventDefault();
+      const videos = document.querySelectorAll("video");
+      let anyPlaying = false;
+      videos.forEach((video) => {
+        if (!video.paused && !video.ended) {
+          anyPlaying = true;
+        }
+      });
+      videos.forEach((video) => {
+        if (anyPlaying) {
+          video.pause();
+        } else {
+          video.play().catch(() => {});
+        }
+      });
+      return;
+    }
+    if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
+      window.shuffleVideosOnGrid();
+      return;
+    }
+    if (e.key === "p") {
+      const hovered = document.querySelector("video:hover");
+      if (!hovered) return;
+      const idMatch = hovered.id.match(/video(\d+)/);
+      if (!idMatch) return;
+      const idx = parseInt(idMatch[1], 10);
+      this.pinnedVideos[idx] = !this.pinnedVideos[idx];
+      // Update pin button state
+      const pinBtn = hovered.parentElement.querySelector(".pin-btn");
+      if (!pinBtn) return;
+      pinBtn.dataset.pinned = this.pinnedVideos[idx] ? "true" : "false";
+    }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      const hovered = document.querySelector("video:hover");
+      if (!hovered || isNaN(hovered.duration)) return;
+      if (e.key === "ArrowLeft") {
+        hovered.currentTime = Math.max(0, hovered.currentTime - 5);
+        return;
+      }
+      hovered.currentTime = Math.min(hovered.duration, hovered.currentTime + 5);
+      return;
+    }
+    if (e.key === "+" || e.key === "=") {
+      this.gridSize += 1;
+      if (this.pinnedVideos.length < this.gridSize) {
+        this.pinnedVideos.length = this.gridSize;
+        for (let i = 0; i < this.gridSize; i++) {
+          if (typeof this.pinnedVideos[i] !== "boolean")
+            this.pinnedVideos[i] = false;
+        }
+      }
+      this.initializeGrid(this.gridSize);
+      for (let i = 0; i < this.gridSize; i++) {
+        const video = document.getElementById(`video${i}`);
+        let src = "";
+        if (this.pinnedVideos[i] && video.src) {
+          continue;
+        }
+        if (this.videoPool[i]) {
+          if (this.videoPool[i] instanceof File) {
+            src = URL.createObjectURL(this.videoPool[i]);
+          } else {
+            src = this.videoPool[i];
+          }
+        }
+        if (src) {
+          window.videoUtil.setVideoSource(video, src, true);
+        } else {
+          video.src = "";
+        }
+      }
+      return;
+    }
+    if (e.key === "-" || e.key === "_" || e.key === "–") {
+      if (this.gridSize <= 1) return;
+      this.gridSize -= 1;
+      this.pinnedVideos.length = this.gridSize;
+      this.initializeGrid(this.gridSize);
+      for (let i = 0; i < this.gridSize; i++) {
+        const video = document.getElementById(`video${i}`);
+        let src = "";
+        if (this.pinnedVideos[i] && video.src) {
+          continue;
+        }
+        if (this.videoPool[i]) {
+          if (this.videoPool[i] instanceof File) {
+            src = URL.createObjectURL(this.videoPool[i]);
+          } else {
+            src = this.videoPool[i];
+          }
+        }
+        if (src) {
+          window.videoUtil.setVideoSource(video, src, true);
+        } else {
+          video.src = "";
+        }
+      }
+      return;
+    }
+  }
+
+  startAutoShuffle() {
+    if (this.autoShuffleInterval) return;
+    this.autoShuffleInterval = setInterval(window.shuffleVideosOnGrid, 3000);
+    console.log("Auto-shuffle started");
+  }
+
+  stopAutoShuffle() {
+    if (!this.autoShuffleInterval) return;
+    clearInterval(this.autoShuffleInterval);
+    this.autoShuffleInterval = null;
+    console.log("Auto-shuffle stopped");
+  }
+
+  initializeGrid(gridSize) {
+    window.initializeGrid(gridSize);
+  }
+
+  attachFullscreenClickHandlers() {
+    const videos = document.querySelectorAll("video");
+    videos.forEach((video) => {
+      video.addEventListener("click", () => {
+        video.classList.add("fullscreen");
+        video.addEventListener(
+          "click",
+          () => {
+            video.classList.remove("fullscreen");
+          },
+          { once: true }
+        );
+      });
+    });
+  }
+}
+
+// Initialize the manager
+window.videoGridManager = new VideoGridManager();
