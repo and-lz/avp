@@ -7,31 +7,30 @@ document.getElementById("poolBtn").addEventListener("click", function () {
 
 document.getElementById("poolInput").addEventListener("change", function (e) {
   videoPool = Array.from(e.target.files);
-
   if (videoPool.length === 0) {
     console.log("No videos selected for pool.");
-  } else {
-    // Save full file paths using the provided directory
-    const videoFilePaths = videoPool.map(
-      (file) => APP_CONFIG.basePath + file.name
-    );
-    localStorage.setItem("videoPoolPaths", JSON.stringify(videoFilePaths));
-    console.log("Saved video file paths to localStorage:", videoFilePaths);
+    return;
+  }
+  // Save full file paths using the provided directory
+  const videoFilePaths = videoPool.map(
+    (file) => APP_CONFIG.basePath + file.name
+  );
+  localStorage.setItem("videoPoolPaths", JSON.stringify(videoFilePaths));
+  console.log("Saved video file paths to localStorage:", videoFilePaths);
 
-    // Refresh the grid with new video options using the selected grid size
-    const selectedGridSize = parseInt(
-      document.getElementById("gridSize").value,
-      10
-    );
-    initializeGrid(selectedGridSize);
-    for (let i = 0; i < selectedGridSize; i++) {
-      const video = document.getElementById(`video${i}`);
-      const src = videoPool[i] ? URL.createObjectURL(videoPool[i]) : "";
-      if (src) {
-        setVideoSourceAndPlay(video, src);
-      } else {
-        video.src = "";
-      }
+  // Refresh the grid with new video options using the selected grid size
+  const selectedGridSize = parseInt(
+    document.getElementById("gridSize").value,
+    10
+  );
+  initializeGrid(selectedGridSize);
+  for (let i = 0; i < selectedGridSize; i++) {
+    const video = document.getElementById(`video${i}`);
+    const src = videoPool[i] ? URL.createObjectURL(videoPool[i]) : "";
+    if (src) {
+      setVideoSourceAndPlay(video, src);
+    } else {
+      video.src = "";
     }
   }
 });
@@ -40,12 +39,11 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
 function loadVideosFromLocalStorage() {
   const savedVideoFileNames = JSON.parse(localStorage.getItem("videoPool"));
   const basePath = APP_CONFIG.basePath;
-
-  if (savedVideoFileNames && savedVideoFileNames.length > 0) {
-    videoPool = savedVideoFileNames.map((name) => basePath + name);
-    return true;
+  if (!savedVideoFileNames || savedVideoFileNames.length === 0) {
+    return false;
   }
-  return false;
+  videoPool = savedVideoFileNames.map((name) => basePath + name);
+  return true;
 }
 
 // Helper function to set video source and playback
@@ -56,51 +54,51 @@ function setVideoSourceAndPlay(video, src) {
 // New helper function to set video source only (no playback)
 // Helper function to set video source only (no playback)
 function setVideoSource(video, src, play = true) {
-  if (video && src) {
-    if (video.src) {
-      URL.revokeObjectURL(video.src);
-    }
-    video.src = src;
-    video.muted = true;
-    video.load();
-    video.onloadedmetadata = function () {
-      video.currentTime = video.duration * 0.5;
-      if (play) {
-        video.play().catch((error) => {
-          console.error("Video playback failed:", error);
-        });
-      }
-    };
-  } else if (video) {
+  if (!video) return;
+  if (!src) {
     video.src = "";
+    return;
   }
+  if (video.src) {
+    URL.revokeObjectURL(video.src);
+  }
+  video.src = src;
+  video.muted = true;
+  video.load();
+  video.onloadedmetadata = function () {
+    video.currentTime = video.duration * 0.5;
+    if (play) {
+      video.play().catch((error) => {
+        console.error("Video playback failed:", error);
+      });
+    }
+  };
 }
 
 // Refactored DOMContentLoaded logic
 function handleDOMContentLoaded() {
-  if (loadVideosFromLocalStorage()) {
-    const gridSize = parseInt(document.getElementById("gridSize").value, 10);
-    initializeGrid(gridSize);
+  if (!loadVideosFromLocalStorage()) return;
+  const gridSize = parseInt(document.getElementById("gridSize").value, 10);
+  initializeGrid(gridSize);
 
+  for (let i = 0; i < gridSize; i++) {
+    const video = document.getElementById(`video${i}`);
+    const src = videoPool[i] || "";
+    window.videoUtil.setVideoSource(video, src, true);
+  }
+
+  setTimeout(() => {
     for (let i = 0; i < gridSize; i++) {
       const video = document.getElementById(`video${i}`);
-      const src = videoPool[i] || "";
-      window.videoUtil.setVideoSource(video, src, true);
-    }
-
-    setTimeout(() => {
-      for (let i = 0; i < gridSize; i++) {
-        const video = document.getElementById(`video${i}`);
-        if (video.src) {
-          video.play().catch((error) => {
-            console.error("Video playback failed:", error);
-          });
-        }
+      if (video.src) {
+        video.play().catch((error) => {
+          console.error("Video playback failed:", error);
+        });
       }
-    }, 500);
+    }
+  }, 500);
 
-    console.log("Videos loaded from local storage and are playing.");
-  }
+  console.log("Videos loaded from local storage and are playing.");
 }
 
 document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
@@ -168,21 +166,20 @@ function attachHandlers(size) {
 
     input.addEventListener("change", (e) => {
       const files = Array.from(e.target.files);
-      if (files.length > 0) {
-        let start = i;
-        for (let j = 0; j < files.length && start + j < size; j++) {
-          const v = document.getElementById("video" + (start + j));
-          const url = URL.createObjectURL(files[j]);
-          v.src = url;
-          v.muted = true;
-          v.load();
-          // Try to autoplay immediately
+      if (files.length === 0) return;
+      let start = i;
+      for (let j = 0; j < files.length && start + j < size; j++) {
+        const v = document.getElementById("video" + (start + j));
+        const url = URL.createObjectURL(files[j]);
+        v.src = url;
+        v.muted = true;
+        v.load();
+        // Try to autoplay immediately
+        v.play().catch(() => {});
+        v.onloadedmetadata = function () {
+          v.currentTime = v.duration * 0.5;
           v.play().catch(() => {});
-          v.onloadedmetadata = function () {
-            v.currentTime = v.duration * 0.5;
-            v.play().catch(() => {});
-          };
-        }
+        };
       }
     });
 
@@ -209,17 +206,16 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
     // Seek only the video being hovered
     const hovered = document.querySelector("video:hover");
-    if (hovered && !isNaN(hovered.duration)) {
-      if (e.key === "ArrowLeft") {
-        hovered.currentTime = Math.max(0, hovered.currentTime - 5);
-      } else {
-        hovered.currentTime = Math.min(
-          hovered.duration,
-          hovered.currentTime + 5
-        );
-      }
+    if (!hovered || isNaN(hovered.duration)) return;
+    if (e.key === "ArrowLeft") {
+      hovered.currentTime = Math.max(0, hovered.currentTime - 5);
+      return;
     }
-  } else if (e.key === "+" || e.key === "=") {
+    hovered.currentTime = Math.min(hovered.duration, hovered.currentTime + 5);
+    return;
+  }
+
+  if (e.key === "+" || e.key === "=") {
     gridSize += 1;
     // Preserve pin state and add new unpinned slot
     if (pinnedVideos.length < gridSize) {
@@ -249,33 +245,36 @@ document.addEventListener("keydown", function (e) {
         video.src = "";
       }
     }
-  } else if (e.key === "-" || e.key === "_" || e.key === "–") {
-    if (gridSize > 1) {
-      gridSize -= 1;
-      // Trim pin state
-      pinnedVideos.length = gridSize;
-      initializeGrid(gridSize);
-      for (let i = 0; i < gridSize; i++) {
-        const video = document.getElementById(`video${i}`);
-        let src = "";
-        if (pinnedVideos[i] && video.src) {
-          // Keep pinned video as is
-          continue;
-        }
-        if (videoPool[i]) {
-          if (videoPool[i] instanceof File) {
-            src = URL.createObjectURL(videoPool[i]);
-          } else {
-            src = videoPool[i];
-          }
-        }
-        if (src) {
-          setVideoSourceAndPlay(video, src);
+    return;
+  }
+
+  if (e.key === "-" || e.key === "_" || e.key === "–") {
+    if (gridSize <= 1) return;
+    gridSize -= 1;
+    // Trim pin state
+    pinnedVideos.length = gridSize;
+    initializeGrid(gridSize);
+    for (let i = 0; i < gridSize; i++) {
+      const video = document.getElementById(`video${i}`);
+      let src = "";
+      if (pinnedVideos[i] && video.src) {
+        // Keep pinned video as is
+        continue;
+      }
+      if (videoPool[i]) {
+        if (videoPool[i] instanceof File) {
+          src = URL.createObjectURL(videoPool[i]);
         } else {
-          video.src = "";
+          src = videoPool[i];
         }
       }
+      if (src) {
+        setVideoSourceAndPlay(video, src);
+      } else {
+        video.src = "";
+      }
     }
+    return;
   }
 });
 
@@ -284,14 +283,13 @@ function addScrubHandler(video) {
   let isDragging = false;
   const throttledScrub = window.util.throttle(function (e) {
     if (!isDragging) return;
+    if (video.readyState < 1 || !video.duration) return;
     const rect = video.getBoundingClientRect();
     const percent = Math.min(
       Math.max((e.clientX - rect.left) / rect.width, 0),
       1
     );
-    if (video.readyState >= 1 && video.duration) {
-      video.currentTime = percent * video.duration;
-    }
+    video.currentTime = percent * video.duration;
   }, 100);
   video.addEventListener("mousedown", function () {
     isDragging = true;
@@ -335,47 +333,47 @@ function applyVideosFromPool(forceReload = false) {
   initializeGrid(gridSize);
   videoPoolIndex = 0; // Reset index when grid size changes
 
-  if (videoPool.length > 0) {
-    // Shuffle pool only once if not already shuffled or if all videos have been shown
-    if (
-      forceReload ||
-      shuffledVideoPool.length === 0 ||
-      shownVideos.size >= videoPool.length
-    ) {
-      shuffledVideoPool = videoPool.slice().sort(() => Math.random() - 0.5);
-      shownVideos.clear(); // Reset the set when reshuffling
-    }
-
-    for (let i = 0; i < gridSize; i++) {
-      const v = document.getElementById("video" + i);
-
-      // Find the next video that hasn't been shown yet
-      let filePath;
-      while (videoPoolIndex < shuffledVideoPool.length) {
-        filePath = shuffledVideoPool[videoPoolIndex];
-        videoPoolIndex++;
-        if (!shownVideos.has(filePath)) {
-          shownVideos.add(filePath);
-          break;
-        }
-      }
-
-      if (filePath) {
-        v.src = filePath;
-        v.muted = true;
-        v.load();
-        v.onloadedmetadata = function () {
-          v.currentTime = v.duration * 0.5;
-          v.play().catch((error) => {
-            console.error("Video playback failed:", error);
-          });
-        };
-      } else {
-        v.src = "";
-      }
-    }
-  } else {
+  if (videoPool.length === 0) {
     console.log("No videos in the pool. Please select videos first.");
+    return;
+  }
+  // Shuffle pool only once if not already shuffled or if all videos have been shown
+  if (
+    forceReload ||
+    shuffledVideoPool.length === 0 ||
+    shownVideos.size >= videoPool.length
+  ) {
+    shuffledVideoPool = videoPool.slice().sort(() => Math.random() - 0.5);
+    shownVideos.clear(); // Reset the set when reshuffling
+  }
+
+  for (let i = 0; i < gridSize; i++) {
+    const v = document.getElementById("video" + i);
+
+    // Find the next video that hasn't been shown yet
+    let filePath;
+    while (videoPoolIndex < shuffledVideoPool.length) {
+      filePath = shuffledVideoPool[videoPoolIndex];
+      videoPoolIndex++;
+      if (!shownVideos.has(filePath)) {
+        shownVideos.add(filePath);
+        break;
+      }
+    }
+
+    if (filePath) {
+      v.src = filePath;
+      v.muted = true;
+      v.load();
+      v.onloadedmetadata = function () {
+        v.currentTime = v.duration * 0.5;
+        v.play().catch((error) => {
+          console.error("Video playback failed:", error);
+        });
+      };
+    } else {
+      v.src = "";
+    }
   }
 }
 
