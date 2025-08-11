@@ -11,7 +11,7 @@ function createVideoElement(id) {
   const video = document.createElement("video");
   video.id = id;
   video.controls = false;
-  video.preload = false;
+  video.preload = "auto";
   video.muted = true;
   video.style.cursor = "default";
   video.style.userSelect = "none";
