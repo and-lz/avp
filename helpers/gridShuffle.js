@@ -13,9 +13,8 @@ function getCurrentGridVideos(gridSize) {
   const currentGridVideos = new Set();
   for (let i = 0; i < gridSize; i++) {
     const v = document.getElementById("video" + i);
-    if (v && v.src) {
-      currentGridVideos.add(v.src);
-    }
+    if (!v || !v.src) continue;
+    currentGridVideos.add(v.src);
   }
   return currentGridVideos;
 }
@@ -23,28 +22,21 @@ function getCurrentGridVideos(gridSize) {
 function getAvailableVideos(currentGridVideos) {
   return videoPool.filter((src) => {
     const key = window.videoUtil.getVideoKey(src);
-    let onGrid = false;
     for (let vSrc of currentGridVideos) {
-      if (vSrc.includes(key)) {
-        onGrid = true;
-        break;
-      }
+      if (vSrc.includes(key)) return false;
     }
-    return !onGrid && !shownVideos.has(key);
+    if (shownVideos.has(key)) return false;
+    return true;
   });
 }
 
 function getFallbackVideos(currentGridVideos) {
   return videoPool.filter((src) => {
     const key = window.videoUtil.getVideoKey(src);
-    let onGrid = false;
     for (let vSrc of currentGridVideos) {
-      if (vSrc.includes(key)) {
-        onGrid = true;
-        break;
-      }
+      if (vSrc.includes(key)) return false;
     }
-    return !onGrid;
+    return true;
   });
 }
 
@@ -52,23 +44,22 @@ function setGridVideos(shuffled, currentGridVideos) {
   let shuffledIdx = 0;
   for (let i = 0; i < gridSize; i++) {
     const v = document.getElementById("video" + i);
-    if (!pinnedVideos[i]) {
-      let url = "";
-      let key = "";
-      if (shuffledIdx < shuffled.length) {
-        const candidate = shuffled[shuffledIdx];
-        key = window.videoUtil.getVideoKey(candidate);
-        if (candidate instanceof File || candidate instanceof Blob) {
-          url = URL.createObjectURL(candidate);
-        } else if (typeof candidate === "string") {
-          url = candidate;
-        }
-        currentGridVideos.add(url);
-        shownVideos.add(key);
+    if (pinnedVideos[i]) continue;
+    let url = "";
+    let key = "";
+    if (shuffledIdx < shuffled.length) {
+      const candidate = shuffled[shuffledIdx];
+      key = window.videoUtil.getVideoKey(candidate);
+      if (candidate instanceof File || candidate instanceof Blob) {
+        url = URL.createObjectURL(candidate);
+      } else if (typeof candidate === "string") {
+        url = candidate;
       }
-      window.videoUtil.setVideoSource(v, url);
-      shuffledIdx++;
+      currentGridVideos.add(url);
+      shownVideos.add(key);
     }
+    window.videoUtil.setVideoSource(v, url);
+    shuffledIdx++;
   }
 }
 
@@ -79,10 +70,13 @@ function shuffleVideosOnGrid() {
   }
   const currentGridVideos = getCurrentGridVideos(gridSize);
   let availableVideos = getAvailableVideos(currentGridVideos);
-  if (availableVideos.length === 0) {
-    shownVideos.clear();
-    availableVideos = getFallbackVideos(currentGridVideos);
+  if (availableVideos.length > 0) {
+    const shuffled = window.videoUtil.shuffleArray(availableVideos);
+    setGridVideos(shuffled, currentGridVideos);
+    return;
   }
+  shownVideos.clear();
+  availableVideos = getFallbackVideos(currentGridVideos);
   const shuffled = window.videoUtil.shuffleArray(availableVideos);
   setGridVideos(shuffled, currentGridVideos);
 }
@@ -90,6 +84,7 @@ function shuffleVideosOnGrid() {
 function attachHandlers(gridSize) {
   Array.from({ length: gridSize }).forEach((_, i) => {
     const video = document.getElementById("video" + i);
+    if (!video) return;
     video.addEventListener("mouseenter", () => {
       video.muted = false;
     });
@@ -117,6 +112,7 @@ function createPinButton(i) {
 
 function initializeGrid(gridSize) {
   const grid = document.getElementById("videoGrid");
+  if (!grid) return;
   grid.innerHTML = "";
 
   const { cols, rows } = window.util.getGridTemplate(gridSize);
@@ -125,6 +121,7 @@ function initializeGrid(gridSize) {
   const fragment = document.createDocumentFragment();
   Array.from({ length: gridSize }).forEach((_, i) => {
     const container = window.grid.createVideoContainer(i);
+    if (!container) return;
     const pinBtn = createPinButton(i);
     container.style.position = "relative";
     container.appendChild(pinBtn);
