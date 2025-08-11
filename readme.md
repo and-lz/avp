@@ -5,11 +5,26 @@ AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling mult
 ### Features
 
 - **Dynamic Grid:** Videos are arranged in a responsive grid that adapts to the number of videos.
-- **Auto-Shuffle:** Videos can be shuffled automatically at intervals (default: every 3 seconds).
+- **Auto-Shuffle:** Videos can be shuffled automatically at intervals (default: every 3 seconds), or you can enable/disable auto-shuffle for continuous randomization.
 - **Lazy Loading:** Videos only play when visible, saving resources.
 - **Fullscreen Support:** Videos can be toggled to fullscreen mode.
-- **Pin/Overlay Controls:** Easily pin or control individual videos.
+- **Pin Button Overlay:** Each video has a pin button (📌) overlay to keep it in place during shuffling.
+- **Video Pool Selection:** Select multiple videos at once using the file input or 🎞️ button.
+- **Persistence:** Selected video file paths are saved to localStorage for convenience.
 - **Keyboard Shortcuts:** Shuffle videos with a shortcut (default: `r`).
+
+### Keyboard Shortcuts
+
+- **Shuffle Videos:** Press `r` to shuffle the videos in the grid.
+- **Fullscreen Toggle:** Double-click a video to toggle fullscreen mode.
+- **Pin Video:** (If implemented) Use the pin button overlay on each video to keep it in place.
+
+### Changing Video Position
+
+You can change the playback position (seek to different moments) in a video by:
+
+- Using the left (`←`) and right (`→`) arrow keys to rewind or fast-forward the currently selected video.
+- Dragging the video's timeline which represents the entire video, to jump to a specific moment.
 
 ### How to Use
 
