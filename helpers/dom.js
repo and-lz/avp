@@ -57,7 +57,7 @@ function toggleVideoStyles(video, isFullscreen = false, styles = {}) {
     left: "0",
     width: "100vw",
     height: "100vh",
-    zIndex: "1000",
+    zIndex: "999",
     backgroundColor: "#000",
   };
 
