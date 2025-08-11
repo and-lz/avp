@@ -10,17 +10,33 @@ class VideoGridManager {
 
   init() {
     this.initializeGrid(this.gridSize);
+    this.setupPoolButton();
+    this.setupPoolInput();
+    this.setupKeydownListener();
+    this.setupGridSizeListener();
+    this.attachFullscreenClickHandlers();
+  }
+
+  setupPoolButton() {
     document.getElementById("poolBtn").addEventListener("click", () => {
       document.getElementById("poolInput").click();
     });
+  }
+
+  setupPoolInput() {
     document
       .getElementById("poolInput")
       .addEventListener("change", (e) => this.handlePoolInput(e));
+  }
+
+  setupKeydownListener() {
     document.addEventListener("keydown", (e) => this.handleKeydown(e));
+  }
+
+  setupGridSizeListener() {
     document
       .getElementById("gridSize")
       .addEventListener("change", window.videoUtil.applyVideosFromPool);
-    this.attachFullscreenClickHandlers();
   }
 
   handlePoolInput(e) {
