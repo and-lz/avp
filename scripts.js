@@ -11,12 +11,6 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
     console.log("No videos selected for pool.");
     return;
   }
-  // Save full file paths using the provided directory
-  const videoFilePaths = videoPool.map(
-    (file) => APP_CONFIG.basePath + file.name
-  );
-  localStorage.setItem("videoPoolPaths", JSON.stringify(videoFilePaths));
-  console.log("Saved video file paths to localStorage:", videoFilePaths);
 
   // Refresh the grid with new video options using the selected grid size
   const selectedGridSize = parseInt(
@@ -34,17 +28,6 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
     }
   }
 });
-
-// Helper function to load videos from local storage
-function loadVideosFromLocalStorage() {
-  const savedVideoFileNames = JSON.parse(localStorage.getItem("videoPool"));
-  const basePath = APP_CONFIG.basePath;
-  if (!savedVideoFileNames || savedVideoFileNames.length === 0) {
-    return false;
-  }
-  videoPool = savedVideoFileNames.map((name) => basePath + name);
-  return true;
-}
 
 // Helper function to set video source and playback
 function setVideoSourceAndPlay(video, src) {
@@ -76,30 +59,7 @@ function setVideoSource(video, src, play = true) {
 }
 
 // Refactored DOMContentLoaded logic
-function handleDOMContentLoaded() {
-  if (!loadVideosFromLocalStorage()) return;
-  const gridSize = parseInt(document.getElementById("gridSize").value, 10);
-  initializeGrid(gridSize);
-
-  for (let i = 0; i < gridSize; i++) {
-    const video = document.getElementById(`video${i}`);
-    const src = videoPool[i] || "";
-    window.videoUtil.setVideoSource(video, src, true);
-  }
-
-  setTimeout(() => {
-    for (let i = 0; i < gridSize; i++) {
-      const video = document.getElementById(`video${i}`);
-      if (video.src) {
-        video.play().catch((error) => {
-          console.error("Video playback failed:", error);
-        });
-      }
-    }
-  }, 500);
-
-  console.log("Videos loaded from local storage and are playing.");
-}
+function handleDOMContentLoaded() {}
 
 document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
 
