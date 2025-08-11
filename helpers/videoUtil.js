@@ -1,3 +1,50 @@
+function applyVideosFromPool(forceReload = false) {
+  initializeGrid(gridSize);
+  videoPoolIndex = 0; // Reset index when grid size changes
+
+  if (videoPool.length === 0) {
+    console.log("No videos in the pool. Please select videos first.");
+    return;
+  }
+  // Shuffle pool only once if not already shuffled or if all videos have been shown
+  if (
+    forceReload ||
+    shuffledVideoPool.length === 0 ||
+    shownVideos.size >= videoPool.length
+  ) {
+    shuffledVideoPool = videoPool.slice().sort(() => Math.random() - 0.5);
+    shownVideos.clear(); // Reset the set when reshuffling
+  }
+
+  for (let i = 0; i < gridSize; i++) {
+    const v = document.getElementById("video" + i);
+
+    // Find the next video that hasn't been shown yet
+    let filePath;
+    while (videoPoolIndex < shuffledVideoPool.length) {
+      filePath = shuffledVideoPool[videoPoolIndex];
+      videoPoolIndex++;
+      if (!shownVideos.has(filePath)) {
+        shownVideos.add(filePath);
+        break;
+      }
+    }
+
+    if (filePath) {
+      v.src = filePath;
+      v.muted = true;
+      v.load();
+      v.onloadedmetadata = function () {
+        v.currentTime = v.duration * 0.5;
+        v.play().catch((error) => {
+          console.error("Video playback failed:", error);
+        });
+      };
+    } else {
+      v.src = "";
+    }
+  }
+}
 // Scrubbing is now per-video: mousemove over a video sets only that video's currentTime
 function addScrubHandler(video) {
   let isDragging = false;
@@ -90,4 +137,5 @@ window.videoUtil = {
   shuffleArray,
   addScrubHandler,
   attachFullscreenHandlers,
+  applyVideosFromPool,
 };
