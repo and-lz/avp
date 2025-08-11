@@ -67,16 +67,28 @@ class VideoGridManager {
   handleKeydown(e) {
     console.log("Key pressed:", e.key);
     console.log("Video pool length:", this.videoPool.length);
-    // Toggle auto-shuffle on 'L' key
+    if (this.handleAutoShuffleKey(e)) return;
+    if (this.handlePlayPauseKey(e)) return;
+    if (this.handleShuffleVideosKey(e)) return;
+    if (this.handlePinKey(e)) return;
+    if (this.handleArrowKey(e)) return;
+    if (this.handleGridIncreaseKey(e)) return;
+    if (this.handleGridDecreaseKey(e)) return;
+  }
+
+  handleAutoShuffleKey(e) {
     if (e.key === "l") {
       if (this.autoShuffleInterval) {
         this.stopAutoShuffle();
       } else {
         this.startAutoShuffle();
       }
-      return;
+      return true;
     }
-    // Toggle play/pause for all videos on space bar
+    return false;
+  }
+
+  handlePlayPauseKey(e) {
     if (e.code === "Space") {
       e.preventDefault();
       const videos = document.querySelectorAll("video");
@@ -93,34 +105,51 @@ class VideoGridManager {
           video.play().catch(() => {});
         }
       });
-      return;
+      return true;
     }
+    return false;
+  }
+
+  handleShuffleVideosKey(e) {
     if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
       window.shuffleVideosOnGrid();
-      return;
+      return true;
     }
+    return false;
+  }
+
+  handlePinKey(e) {
     if (e.key === "p") {
       const hovered = document.querySelector("video:hover");
-      if (!hovered) return;
+      if (!hovered) return true;
       const idMatch = hovered.id.match(/video(\d+)/);
-      if (!idMatch) return;
+      if (!idMatch) return true;
       const idx = parseInt(idMatch[1], 10);
       this.pinnedVideos[idx] = !this.pinnedVideos[idx];
       // Update pin button state
       const pinBtn = hovered.parentElement.querySelector(".pin-btn");
-      if (!pinBtn) return;
+      if (!pinBtn) return true;
       pinBtn.dataset.pinned = this.pinnedVideos[idx] ? "true" : "false";
+      return true;
     }
+    return false;
+  }
+
+  handleArrowKey(e) {
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       const hovered = document.querySelector("video:hover");
-      if (!hovered || isNaN(hovered.duration)) return;
+      if (!hovered || isNaN(hovered.duration)) return true;
       if (e.key === "ArrowLeft") {
         hovered.currentTime = Math.max(0, hovered.currentTime - 5);
-        return;
+        return true;
       }
       hovered.currentTime = Math.min(hovered.duration, hovered.currentTime + 5);
-      return;
+      return true;
     }
+    return false;
+  }
+
+  handleGridIncreaseKey(e) {
     if (e.key === "+" || e.key === "=") {
       this.gridSize += 1;
       if (this.pinnedVideos.length < this.gridSize) {
@@ -131,55 +160,47 @@ class VideoGridManager {
         }
       }
       this.initializeGrid(this.gridSize);
-      for (let i = 0; i < this.gridSize; i++) {
-        const video = document.getElementById(`video${i}`);
-        let src = "";
-        if (this.pinnedVideos[i] && video.src) {
-          continue;
-        }
-        if (this.videoPool[i]) {
-          if (this.videoPool[i] instanceof File) {
-            src = URL.createObjectURL(this.videoPool[i]);
-          } else {
-            src = this.videoPool[i];
-          }
-        }
-        if (src) {
-          window.videoUtil.setVideoSource(video, src, true);
-        } else {
-          video.src = "";
-        }
-      }
-      return;
+      this.applyVideosToGrid();
+      return true;
     }
+    return false;
+  }
+
+  handleGridDecreaseKey(e) {
     if (e.key === "-" || e.key === "_" || e.key === "–") {
-      if (this.gridSize <= 1) return;
+      if (this.gridSize <= 1) return true;
       this.gridSize -= 1;
       this.pinnedVideos.length = this.gridSize;
       this.initializeGrid(this.gridSize);
-      for (let i = 0; i < this.gridSize; i++) {
-        const video = document.getElementById(`video${i}`);
-        let src = "";
-        if (this.pinnedVideos[i] && video.src) {
-          continue;
-        }
-        if (this.videoPool[i]) {
-          if (this.videoPool[i] instanceof File) {
-            src = URL.createObjectURL(this.videoPool[i]);
-          } else {
-            src = this.videoPool[i];
-          }
-        }
-        if (src) {
-          window.videoUtil.setVideoSource(video, src, true);
+      this.applyVideosToGrid();
+      return true;
+    }
+    return false;
+  }
+
+  applyVideosToGrid() {
+    for (let i = 0; i < this.gridSize; i++) {
+      const video = document.getElementById(`video${i}`);
+      let src = "";
+      if (this.pinnedVideos[i] && video.src) {
+        continue;
+      }
+      if (this.videoPool[i]) {
+        if (this.videoPool[i] instanceof File) {
+          src = URL.createObjectURL(this.videoPool[i]);
         } else {
-          video.src = "";
+          src = this.videoPool[i];
         }
       }
-      return;
+      if (src) {
+        window.videoUtil.setVideoSource(video, src, true);
+      } else {
+        video.src = "";
+      }
     }
   }
 
+  // Existing methods below remain unchanged
   startAutoShuffle() {
     if (this.autoShuffleInterval) return;
     this.autoShuffleInterval = setInterval(window.shuffleVideosOnGrid, 3000);
@@ -213,6 +234,8 @@ class VideoGridManager {
     });
   }
 }
+
+// Initialize the manager
 
 // Initialize the manager
 window.videoGridManager = new VideoGridManager();
