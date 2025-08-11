@@ -78,14 +78,14 @@ function shuffleVideosOnGrid() {
   const currentGridVideos = getCurrentGridVideos(gridSize);
   let availableVideos = getAvailableVideos(currentGridVideos);
   if (availableVideos.length > 0) {
-    const shuffled = window.videoUtil.shuffleArray(availableVideos);
+    const shuffled = window.util.shuffleArray(availableVideos);
     setGridVideos(shuffled, currentGridVideos);
     return;
   }
   const shownVideos = window.videoGridManager?.shownVideos || new Set();
   shownVideos.clear();
   availableVideos = getFallbackVideos(currentGridVideos);
-  const shuffled = window.videoUtil.shuffleArray(availableVideos);
+  const shuffled = window.util.shuffleArray(availableVideos);
   setGridVideos(shuffled, currentGridVideos);
 }
 

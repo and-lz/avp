@@ -133,7 +133,6 @@ function tryPlayVideo(video) {
 window.videoUtil = {
   getVideoKey,
   setVideoSource,
-  shuffleArray,
   addScrubHandler,
   attachFullscreenHandlers,
   applyVideosFromPool,
