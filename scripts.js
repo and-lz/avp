@@ -167,26 +167,6 @@ document.addEventListener("keydown", function (e) {
 function attachHandlers(size) {
   for (let i = 0; i < size; i++) {
     const video = document.getElementById("video" + i);
-    const input = document.getElementById("input" + i);
-
-    input.addEventListener("change", (e) => {
-      const files = Array.from(e.target.files);
-      if (files.length === 0) return;
-      let start = i;
-      for (let j = 0; j < files.length && start + j < size; j++) {
-        const v = document.getElementById("video" + (start + j));
-        const url = URL.createObjectURL(files[j]);
-        v.src = url;
-        v.muted = true;
-        v.load();
-        // Try to autoplay immediately
-        v.play().catch(() => {});
-        v.onloadedmetadata = function () {
-          v.currentTime = v.duration * 0.5;
-          v.play().catch(() => {});
-        };
-      }
-    });
 
     video.addEventListener("mouseenter", () => {
       video.muted = false;
