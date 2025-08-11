@@ -1,45 +1,7 @@
-// Utility: Get a unique key for a video source
-function getVideoKey(src) {
-  if (src instanceof File) return src.name;
-  if (src instanceof Blob && src.name) return src.name;
-  if (typeof src === "string") return src;
-  return String(src);
-}
-
-// Utility: Set video source and optionally play
-function setVideoSource(video, src, play = true) {
-  if (video && src) {
-    if (video.src) {
-      URL.revokeObjectURL(video.src);
-    }
-    video.src = src;
-    video.muted = true;
-    video.load();
-    video.onloadedmetadata = function () {
-      video.currentTime = video.duration * 0.5;
-      if (play) {
-        video.play().catch((error) => {
-          console.error("Video playback failed:", error);
-        });
-      }
-    };
-  } else if (video) {
-    video.src = "";
-  }
-}
-
-// Utility: Shuffle array
-function shuffleArray(arr) {
-  return arr.slice().sort(() => Math.random() - 0.5);
-}
-// Removed ES6 import and updated references to use window.grid
 let shownVideos = new Set();
-// Declared the missing shownVideos variable as a Set to fix the ReferenceError.
-
-// Auto-shuffle state
 let autoShuffleInterval = null;
 function startAutoShuffle() {
-  if (autoShuffleInterval) return; // Already running
+  if (autoShuffleInterval) return;
   autoShuffleInterval = setInterval(() => {
     shuffleVideosOnGrid();
   }, 3000);
@@ -66,7 +28,7 @@ function shuffleVideosOnGrid() {
     }
   }
   let availableVideos = videoPool.filter((src) => {
-    const key = getVideoKey(src);
+    const key = window.videoUtil.getVideoKey(src);
     let onGrid = false;
     for (let vSrc of currentGridVideos) {
       if (vSrc.includes(key)) {
@@ -79,7 +41,7 @@ function shuffleVideosOnGrid() {
   if (availableVideos.length === 0) {
     shownVideos.clear();
     availableVideos = videoPool.filter((src) => {
-      const key = getVideoKey(src);
+      const key = window.videoUtil.getVideoKey(src);
       let onGrid = false;
       for (let vSrc of currentGridVideos) {
         if (vSrc.includes(key)) {
@@ -90,7 +52,7 @@ function shuffleVideosOnGrid() {
       return !onGrid;
     });
   }
-  const shuffled = shuffleArray(availableVideos);
+  const shuffled = window.videoUtil.shuffleArray(availableVideos);
   let shuffledIdx = 0;
   for (let i = 0; i < gridSize; i++) {
     const v = document.getElementById("video" + i);
@@ -99,7 +61,7 @@ function shuffleVideosOnGrid() {
       let key = "";
       if (shuffledIdx < shuffled.length) {
         const candidate = shuffled[shuffledIdx];
-        key = getVideoKey(candidate);
+        key = window.videoUtil.getVideoKey(candidate);
         if (candidate instanceof File || candidate instanceof Blob) {
           url = URL.createObjectURL(candidate);
         } else if (typeof candidate === "string") {
@@ -108,7 +70,7 @@ function shuffleVideosOnGrid() {
         currentGridVideos.add(url);
         shownVideos.add(key);
       }
-      setVideoSource(v, url);
+      window.videoUtil.setVideoSource(v, url);
       shuffledIdx++;
     }
   }
@@ -145,7 +107,6 @@ function initializeGrid(size) {
 
   attachHandlers(size);
   attachFullscreenHandlers();
-  // initializeLazyLoading(); // Add lazy loading (function not defined)
 }
 
 // Pool input and button logic
@@ -198,7 +159,7 @@ function loadVideosFromLocalStorage() {
 
 // Helper function to set video source and playback
 function setVideoSourceAndPlay(video, src) {
-  setVideoSource(video, src, true);
+  window.videoUtil.setVideoSource(video, src, true);
 }
 
 // New helper function to set video source only (no playback)
@@ -206,7 +167,7 @@ function setVideoSourceAndPlay(video, src) {
 function setVideoSource(video, src, play = true) {
   if (video && src) {
     if (video.src) {
-      URL.revokeObjectURL(video.src); // Revoke previous URL
+      URL.revokeObjectURL(video.src);
     }
     video.src = src;
     video.muted = true;
@@ -233,7 +194,7 @@ function handleDOMContentLoaded() {
     for (let i = 0; i < gridSize; i++) {
       const video = document.getElementById(`video${i}`);
       const src = videoPool[i] || "";
-      setVideoSource(video, src, true);
+      window.videoUtil.setVideoSource(video, src, true);
     }
 
     setTimeout(() => {
@@ -395,7 +356,6 @@ function attachHandlers(size) {
     const video = document.getElementById("video" + i);
     const input = document.getElementById("input" + i);
 
-    // Remove click-to-select-file behavior
     input.addEventListener("change", (e) => {
       const files = Array.from(e.target.files);
       if (files.length > 0) {
@@ -416,7 +376,6 @@ function attachHandlers(size) {
       }
     });
 
-    // Unmute on hover, mute on leave
     video.addEventListener("mouseenter", () => {
       video.muted = false;
     });
@@ -424,7 +383,6 @@ function attachHandlers(size) {
       video.muted = true;
     });
 
-    // Add scrub handler
     addScrubHandler(video);
   }
 }
@@ -536,23 +494,19 @@ function attachFullscreenHandlers() {
   const videos = document.querySelectorAll("video");
   videos.forEach((video) => {
     video.addEventListener("dblclick", function fullscreenHandler() {
-      // Pause all other videos
       videos.forEach((v) => {
         if (v !== video) {
           v.pause();
         }
       });
 
-      // Apply fullscreen styles to the clicked video
       window.dom.toggleVideoStyles(video, true);
 
       video.addEventListener(
         "dblclick",
         function exitFullscreenHandler() {
-          // Reset styles
           window.dom.toggleVideoStyles(video, false);
 
-          // Play all videos again
           videos.forEach((v) => {
             v.play();
           });
@@ -637,5 +591,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-
-// Declared the missing shownVideos variable as a Set to fix the ReferenceError.
