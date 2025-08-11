@@ -142,18 +142,21 @@ document.addEventListener("keydown", function (e) {
 
   if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
     window.shuffleVideosOnGrid();
-  } else if (e.key === "p" || e.key === "P") {
+    return;
+  }
+
+  if (e.key === "p") {
     const hovered = document.querySelector("video:hover");
-    if (hovered) {
-      const idMatch = hovered.id.match(/video(\d+)/);
-      if (idMatch) {
-        const idx = parseInt(idMatch[1], 10);
-        pinnedVideos[idx] = !pinnedVideos[idx];
-        // Update pin button state
-        const pinBtn = hovered.parentElement.querySelector(".pin-btn");
-        if (pinBtn) {
-          pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
-        }
+    if (!hovered) return;
+
+    const idMatch = hovered.id.match(/video(\d+)/);
+    if (idMatch) {
+      const idx = parseInt(idMatch[1], 10);
+      pinnedVideos[idx] = !pinnedVideos[idx];
+      // Update pin button state
+      const pinBtn = hovered.parentElement.querySelector(".pin-btn");
+      if (pinBtn) {
+        pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
       }
     }
   }
