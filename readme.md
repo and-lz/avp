@@ -60,3 +60,18 @@ helpers/
 ### License
 
 MIT
+
+### Use Case Scenarios
+
+AVP is not intended for single video playback. Its core purpose is to present, shuffle, and interact with multiple videos simultaneously in a dynamic grid. If you need to show just one video, a standard video player is more appropriate.
+
+AVP excels in scenarios where multi-video presentation and rapid switching are required:
+
+- **Live Events & Performances:** Instantly shuffle and display several video feeds for VJing, concerts, or art installations, creating dynamic visual experiences.
+- **Video Pool Management:** Preview, organize, and compare many video files at once—ideal for editors, curators, or archivists handling large collections.
+- **Creative Displays:** Build interactive video walls or kiosks in galleries, museums, or public spaces, with the ability to shuffle and rearrange content on the fly.
+- **Education & Training:** Present multiple instructional videos for workshops, classrooms, or remote learning, allowing quick switching and comparison.
+- **Testing & Review:** Developers and testers can rapidly preview, shuffle, and compare video assets during development or QA.
+- **Personal Use:** Home users can create video collages or shuffle family videos for group viewing and entertainment.
+
+All these use cases leverage AVP's ability to display, shuffle, and manage multiple videos at once—making it a unique tool for multi-video scenarios.
