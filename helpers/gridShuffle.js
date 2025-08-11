@@ -1,14 +1,30 @@
+/**
+ * Starts the automatic shuffling of videos on the grid.
+ * @function startAutoShuffle
+ */
 function startAutoShuffle() {
   if (autoShuffleInterval) return;
   autoShuffleInterval = setInterval(shuffleVideosOnGrid, 3000);
   console.log("Auto-shuffle started");
 }
+
+/**
+ * Stops the automatic shuffling of videos on the grid.
+ * @function stopAutoShuffle
+ */
 function stopAutoShuffle() {
   if (!autoShuffleInterval) return;
   clearInterval(autoShuffleInterval);
   autoShuffleInterval = null;
   console.log("Auto-shuffle stopped");
 }
+
+/**
+ * Gets the currently displayed videos on the grid.
+ * @function getCurrentGridVideos
+ * @param {number} gridSize - The size of the grid.
+ * @returns {Set} A set of currently displayed video sources.
+ */
 function getCurrentGridVideos(gridSize) {
   const currentGridVideos = new Set();
   for (let i = 0; i < gridSize; i++) {
@@ -19,6 +35,12 @@ function getCurrentGridVideos(gridSize) {
   return currentGridVideos;
 }
 
+/**
+ * Gets the available videos that can be shown on the grid.
+ * @function getAvailableVideos
+ * @param {Set} currentGridVideos - A set of currently displayed video sources.
+ * @returns {Array} An array of available video sources.
+ */
 function getAvailableVideos(currentGridVideos) {
   const videoPool = window.videoGridManager?.videoPool || [];
   return videoPool.filter((src) => {
@@ -32,6 +54,12 @@ function getAvailableVideos(currentGridVideos) {
   });
 }
 
+/**
+ * Gets the fallback videos that can be shown on the grid if no other videos are available.
+ * @function getFallbackVideos
+ * @param {Set} currentGridVideos - A set of currently displayed video sources.
+ * @returns {Array} An array of fallback video sources.
+ */
 function getFallbackVideos(currentGridVideos) {
   const videoPool = window.videoGridManager?.videoPool || [];
   return videoPool.filter((src) => {
@@ -43,6 +71,12 @@ function getFallbackVideos(currentGridVideos) {
   });
 }
 
+/**
+ * Sets the videos to be displayed on the grid.
+ * @function setGridVideos
+ * @param {Array} shuffled - An array of shuffled video sources.
+ * @param {Set} currentGridVideos - A set of currently displayed video sources.
+ */
 function setGridVideos(shuffled, currentGridVideos) {
   let shuffledIdx = 0;
   const gridSize = window.videoGridManager?.gridSize || 4;
@@ -68,6 +102,10 @@ function setGridVideos(shuffled, currentGridVideos) {
   }
 }
 
+/**
+ * Shuffles the videos on the grid.
+ * @function shuffleVideosOnGrid
+ */
 function shuffleVideosOnGrid() {
   const videoPool = window.videoGridManager?.videoPool || [];
   const gridSize = window.videoGridManager?.gridSize || 4;
@@ -91,6 +129,11 @@ function shuffleVideosOnGrid() {
 
 window.shuffleVideosOnGrid = shuffleVideosOnGrid;
 
+/**
+ * Attaches event handlers to the video elements in the grid.
+ * @function attachHandlers
+ * @param {number} gridSize - The size of the grid.
+ */
 function attachHandlers(gridSize) {
   Array.from({ length: gridSize }).forEach((_, i) => {
     const video = document.getElementById("video" + i);
@@ -105,7 +148,12 @@ function attachHandlers(gridSize) {
   });
 }
 
-// Refactored initializeGrid function
+/**
+ * Creates a pin button for a video element.
+ * @function createPinButton
+ * @param {number} i - The index of the video element.
+ * @returns {HTMLButtonElement} The created pin button element.
+ */
 function createPinButton(i) {
   const pinBtn = document.createElement("button");
   pinBtn.className = "pin-btn";
@@ -127,6 +175,11 @@ function createPinButton(i) {
   return pinBtn;
 }
 
+/**
+ * Initializes the video grid.
+ * @function initializeGrid
+ * @param {number} gridSize - The size of the grid.
+ */
 function initializeGrid(gridSize) {
   const grid = document.getElementById("videoGrid");
   if (!grid) return;

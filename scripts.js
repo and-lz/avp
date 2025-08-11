@@ -1,10 +1,23 @@
-// App configuration
+/**
+ * Application configuration object.
+ * @type {Object}
+ * @property {Object} shortcuts - Keyboard shortcuts for the application.
+ * @property {string} shortcuts.shuffleVideos - Key to shuffle videos.
+ */
 const APP_CONFIG = {
   shortcuts: {
     shuffleVideos: "r",
   },
 };
+
+/**
+ * Manages the video grid and its interactions.
+ */
 class VideoGridManager {
+  /**
+   * Creates a new VideoGridManager instance.
+   * @param {number} [gridSize=4] - Initial size of the video grid.
+   */
   constructor(gridSize = 4) {
     this.gridSize = gridSize;
     this.pinnedVideos = [];
@@ -14,6 +27,9 @@ class VideoGridManager {
     this.init();
   }
 
+  /**
+   * Initializes the video grid manager.
+   */
   init() {
     this.initializeGrid(this.gridSize);
     this.setupPoolButton();
@@ -23,28 +39,44 @@ class VideoGridManager {
     this.attachFullscreenClickHandlers();
   }
 
+  /**
+   * Sets up the pool button click listener.
+   */
   setupPoolButton() {
     document.getElementById("poolBtn").addEventListener("click", () => {
       document.getElementById("poolInput").click();
     });
   }
 
+  /**
+   * Sets up the pool input change listener.
+   */
   setupPoolInput() {
     document
       .getElementById("poolInput")
       .addEventListener("change", (e) => this.handlePoolInput(e));
   }
 
+  /**
+   * Sets up the keydown event listener.
+   */
   setupKeydownListener() {
     document.addEventListener("keydown", (e) => this.handleKeydown(e));
   }
 
+  /**
+   * Sets up the grid size change listener.
+   */
   setupGridSizeListener() {
     document
       .getElementById("gridSize")
       .addEventListener("change", window.videoUtil.applyVideosFromPool);
   }
 
+  /**
+   * Handles the pool input change event.
+   * @param {Event} e - The change event.
+   */
   handlePoolInput(e) {
     this.videoPool = Array.from(e.target.files);
     if (this.videoPool.length === 0) {
@@ -70,6 +102,10 @@ class VideoGridManager {
     }
   }
 
+  /**
+   * Handles the keydown event.
+   * @param {KeyboardEvent} e - The keydown event.
+   */
   handleKeydown(e) {
     console.log("Key pressed:", e.key);
     console.log("Video pool length:", this.videoPool.length);
@@ -82,6 +118,11 @@ class VideoGridManager {
     if (this.handleGridDecreaseKey(e)) return;
   }
 
+  /**
+   * Handles the auto-shuffle key press.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
   handleAutoShuffleKey(e) {
     if (e.key === "l") {
       if (this.autoShuffleInterval) {
@@ -94,6 +135,11 @@ class VideoGridManager {
     return false;
   }
 
+  /**
+   * Handles the play/pause toggle on space key press.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
   handlePlayPauseKey(e) {
     if (e.code === "Space") {
       e.preventDefault();
@@ -116,6 +162,11 @@ class VideoGridManager {
     return false;
   }
 
+  /**
+   * Handles the shuffle videos shortcut key.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
   handleShuffleVideosKey(e) {
     if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
       executeViewTransition(() => {
@@ -126,6 +177,11 @@ class VideoGridManager {
     return false;
   }
 
+  /**
+   * Handles the pinning and unpinning of videos.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
   handlePinKey(e) {
     if (e.key === "p") {
       const hovered = document.querySelector("video:hover");
@@ -143,6 +199,11 @@ class VideoGridManager {
     return false;
   }
 
+  /**
+   * Handles the seek functionality with arrow keys.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
   handleArrowKey(e) {
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
       const hovered = document.querySelector("video:hover");
@@ -157,6 +218,11 @@ class VideoGridManager {
     return false;
   }
 
+  /**
+   * Increases the grid size.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
   handleGridIncreaseKey(e) {
     if (e.key === "+" || e.key === "=") {
       executeViewTransition(() => {
@@ -176,6 +242,11 @@ class VideoGridManager {
     return false;
   }
 
+  /**
+   * Decreases the grid size.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
   handleGridDecreaseKey(e) {
     if (e.key === "-" || e.key === "_" || e.key === "–") {
       if (this.gridSize <= 1) return true;
@@ -190,6 +261,9 @@ class VideoGridManager {
     return false;
   }
 
+  /**
+   * Applies the videos from the pool to the grid.
+   */
   applyVideosToGrid() {
     for (let i = 0; i < this.gridSize; i++) {
       const video = document.getElementById(`video${i}`);
@@ -212,13 +286,18 @@ class VideoGridManager {
     }
   }
 
-  // Existing methods below remain unchanged
+  /**
+   * Starts the auto-shuffle feature.
+   */
   startAutoShuffle() {
     if (this.autoShuffleInterval) return;
     this.autoShuffleInterval = setInterval(window.shuffleVideosOnGrid, 3000);
     console.log("Auto-shuffle started");
   }
 
+  /**
+   * Stops the auto-shuffle feature.
+   */
   stopAutoShuffle() {
     if (!this.autoShuffleInterval) return;
     clearInterval(this.autoShuffleInterval);
@@ -226,10 +305,17 @@ class VideoGridManager {
     console.log("Auto-shuffle stopped");
   }
 
+  /**
+   * Initializes the grid with the given size.
+   * @param {number} gridSize - The size of the grid.
+   */
   initializeGrid(gridSize) {
     window.initializeGrid(gridSize);
   }
 
+  /**
+   * Attaches click handlers for fullscreen functionality.
+   */
   attachFullscreenClickHandlers() {
     const videos = document.querySelectorAll("video");
     videos.forEach((video) => {
