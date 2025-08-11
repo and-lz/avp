@@ -169,7 +169,7 @@ class VideoGridManager {
    */
   handleShuffleVideosKey(e) {
     if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
-      executeViewTransition(() => {
+      window.viewTransitionUtil.executeViewTransition(() => {
         window.shuffleVideosOnGrid();
       });
       return true;
@@ -225,7 +225,7 @@ class VideoGridManager {
    */
   handleGridIncreaseKey(e) {
     if (e.key === "+" || e.key === "=") {
-      executeViewTransition(() => {
+      window.viewTransitionUtil.executeViewTransition(() => {
         this.gridSize += 1;
         if (this.pinnedVideos.length < this.gridSize) {
           this.pinnedVideos.length = this.gridSize;
