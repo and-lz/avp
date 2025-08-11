@@ -118,7 +118,9 @@ class VideoGridManager {
 
   handleShuffleVideosKey(e) {
     if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
-      window.shuffleVideosOnGrid();
+      executeViewTransition(() => {
+        window.shuffleVideosOnGrid();
+      });
       return true;
     }
     return false;
@@ -157,16 +159,18 @@ class VideoGridManager {
 
   handleGridIncreaseKey(e) {
     if (e.key === "+" || e.key === "=") {
-      this.gridSize += 1;
-      if (this.pinnedVideos.length < this.gridSize) {
-        this.pinnedVideos.length = this.gridSize;
-        for (let i = 0; i < this.gridSize; i++) {
-          if (typeof this.pinnedVideos[i] !== "boolean")
-            this.pinnedVideos[i] = false;
+      executeViewTransition(() => {
+        this.gridSize += 1;
+        if (this.pinnedVideos.length < this.gridSize) {
+          this.pinnedVideos.length = this.gridSize;
+          for (let i = 0; i < this.gridSize; i++) {
+            if (typeof this.pinnedVideos[i] !== "boolean")
+              this.pinnedVideos[i] = false;
+          }
         }
-      }
-      this.initializeGrid(this.gridSize);
-      this.applyVideosToGrid();
+        this.initializeGrid(this.gridSize);
+        this.applyVideosToGrid();
+      });
       return true;
     }
     return false;
@@ -175,10 +179,12 @@ class VideoGridManager {
   handleGridDecreaseKey(e) {
     if (e.key === "-" || e.key === "_" || e.key === "–") {
       if (this.gridSize <= 1) return true;
-      this.gridSize -= 1;
-      this.pinnedVideos.length = this.gridSize;
-      this.initializeGrid(this.gridSize);
-      this.applyVideosToGrid();
+      executeViewTransition(() => {
+        this.gridSize -= 1;
+        this.pinnedVideos.length = this.gridSize;
+        this.initializeGrid(this.gridSize);
+        this.applyVideosToGrid();
+      });
       return true;
     }
     return false;
