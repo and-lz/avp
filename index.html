@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,12 +14,28 @@
         },
       };
     </script>
-    <div
-      id="videoGrid"
-      style="width: 100vw; height: 100vh; display: grid; gap: 0"
-    ></div>
-    <input type="file" id="poolInput" accept="video/*" multiple />
-    <button id="poolBtn" autofocus>🎞️</button>
+    <main>
+      
+      <section aria-label="Video grid" tabindex="0">
+        <div
+          id="videoGrid"
+          style="width: 100vw; height: 100vh; display: grid; gap: 0"
+          role="grid"
+          aria-live="polite"
+        ></div>
+      </section>
+      <section aria-label="Video pool controls">
+        <label for="poolInput" id="poolInputLabel">Add videos</label>
+        <input
+          type="file"
+          id="poolInput"
+          accept="video/*"
+          multiple
+          aria-labelledby="poolInputLabel"
+        />
+        <button id="poolBtn" autofocus aria-label="Open video pool">🎞️</button>
+      </section>
+    </main>
     <script src="./helpers/grid.js"></script>
     <script src="./helpers/dom.js"></script>
     <script src="./helpers/util.js"></script>
