@@ -6,22 +6,20 @@ AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling mult
 
 - **Dynamic Grid:** Responsive grid adapts to the number of videos.
 - **Auto-Shuffle:** Shuffle videos automatically at intervals (default: every 3 seconds) or toggle on/off.
-- **Fullscreen Support:** Double-click to toggle fullscreen mode.
+- **Fullscreen Support:** Click a video to toggle fullscreen styling (not browser fullscreen).
 - **Pin Button Overlay:** Pin videos in place during shuffling by clicking the pin button (📌) or pressing `p` while hovering.
 - **Video Pool Selection:** Select multiple videos at once using the file input or 🎞️ button.
-- **Persistence:** Selected video file paths are saved to localStorage and automatically loaded when you reopen the page.
 - **Keyboard Shortcuts & Controls:** See below for all shortcuts and controls.
 
 ### Keyboard Shortcuts & Usage Tips
 
 - **Shuffle Videos:** Press `r` to shuffle the videos in the grid.
 - **Auto-Shuffle Toggle:** Press `l` to enable or disable auto-shuffling.
-- **Fullscreen Toggle:** Double-click a video to toggle fullscreen mode.
+- **Fullscreen Toggle:** Click a video to toggle fullscreen styling (not browser fullscreen).
 - **Play/Pause All Videos:** Press the space bar to toggle play/pause for all videos.
 - **Pin Video:** Click the pin button (📌) or hover and press `p` to pin/unpin.
 - **Adjust Grid Size:** Use minus (`-`) and plus (`+`) keys or the number input.
 - **Change Video Position:** Use left/right arrow keys to seek, or drag across the video area to scrub.
-- **Mute/Unmute on Hover:** Videos are muted by default; hover to unmute.
 - **Accessibility:** All controls are labeled for screen readers and keyboard navigation.
 
 ### How to Use
@@ -66,6 +64,10 @@ AVP excels in scenarios where multi-video presentation and rapid switching are r
 - **Personal Use:** Create video collages or shuffle family videos for group viewing and entertainment.
 
 ### Known Limitations
+
+- No persistence: selected videos are not saved after reload.
+- No mute/unmute on hover: videos play with default browser settings.
+- Fullscreen is a visual effect, not true browser fullscreen.
 
 - Only local video files are supported; network streams are not.
 - Some browsers may restrict autoplay or fullscreen behavior.
