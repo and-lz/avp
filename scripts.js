@@ -26,27 +26,6 @@ function shuffleVideosOnGrid() {
   document.dispatchEvent(event);
 }
 
-// Lazy load videos using Intersection Observer
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    const video = entry.target;
-    if (entry.isIntersecting) {
-      video.play().catch((error) => {
-        console.error("Video playback failed:", error);
-      });
-    } else {
-      video.pause();
-    }
-  });
-});
-
-function initializeLazyLoading() {
-  const videos = document.querySelectorAll("video");
-  videos.forEach((video) => {
-    observer.observe(video);
-  });
-}
-
 // Refactored initializeGrid function
 function initializeGrid(size) {
   const grid = document.getElementById("videoGrid");
