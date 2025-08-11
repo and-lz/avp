@@ -9,9 +9,12 @@ AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling mult
 - **Fullscreen Support:** Click a video to toggle fullscreen styling (not browser fullscreen).
 - **Pin Button Overlay:** Pin videos in place during shuffling by clicking the pin button (📌) or pressing `p` while hovering.
 - **Video Pool Selection:** Select multiple videos at once using the file input or 🎞️ button.
+- **Mute/Unmute on Hover:** Videos are muted by default; the one you hover will play audio.
 - **Keyboard Shortcuts & Controls:** See below for all shortcuts and controls.
 
 ### Keyboard Shortcuts & Usage Tips
+
+- **Mute/Unmute on Hover:** Videos are muted by default; the one you hover will play audio.
 
 - **Shuffle Videos:** Press `r` to shuffle the videos in the grid.
 - **Auto-Shuffle Toggle:** Press `l` to enable or disable auto-shuffling.
@@ -66,9 +69,6 @@ AVP excels in scenarios where multi-video presentation and rapid switching are r
 ### Known Limitations
 
 - No persistence: selected videos are not saved after reload.
-- No mute/unmute on hover: videos play with default browser settings.
-- Fullscreen is a visual effect, not true browser fullscreen.
-
 - Only local video files are supported; network streams are not.
 - Some browsers may restrict autoplay or fullscreen behavior.
 - Pinning is per session and not persisted after reload.
