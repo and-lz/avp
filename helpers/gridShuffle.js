@@ -74,6 +74,21 @@ function shuffleVideosOnGrid() {
   }
 }
 
+function attachHandlers(size) {
+  for (let i = 0; i < size; i++) {
+    const video = document.getElementById("video" + i);
+
+    video.addEventListener("mouseenter", () => {
+      video.muted = false;
+    });
+    video.addEventListener("mouseleave", () => {
+      video.muted = true;
+    });
+
+    window.videoUtil.addScrubHandler(video);
+  }
+}
+
 // Refactored initializeGrid function
 function initializeGrid(size) {
   const grid = document.getElementById("videoGrid");

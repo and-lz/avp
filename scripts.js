@@ -164,21 +164,6 @@ document.addEventListener("keydown", function (e) {
   }
 });
 
-function attachHandlers(size) {
-  for (let i = 0; i < size; i++) {
-    const video = document.getElementById("video" + i);
-
-    video.addEventListener("mouseenter", () => {
-      video.muted = false;
-    });
-    video.addEventListener("mouseleave", () => {
-      video.muted = true;
-    });
-
-    window.videoUtil.addScrubHandler(video);
-  }
-}
-
 document
   .getElementById("gridSize")
   .addEventListener("change", window.videoUtil.applyVideosFromPool);
