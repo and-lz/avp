@@ -150,15 +150,14 @@ document.addEventListener("keydown", function (e) {
     if (!hovered) return;
 
     const idMatch = hovered.id.match(/video(\d+)/);
-    if (idMatch) {
-      const idx = parseInt(idMatch[1], 10);
-      pinnedVideos[idx] = !pinnedVideos[idx];
-      // Update pin button state
-      const pinBtn = hovered.parentElement.querySelector(".pin-btn");
-      if (pinBtn) {
-        pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
-      }
-    }
+    if (!idMatch) return;
+    const idx = parseInt(idMatch[1], 10);
+    pinnedVideos[idx] = !pinnedVideos[idx];
+
+    // Update pin button state
+    const pinBtn = hovered.parentElement.querySelector(".pin-btn");
+    if (!pinBtn) return;
+    pinBtn.dataset.pinned = pinnedVideos[idx] ? "true" : "false";
   }
 });
 
