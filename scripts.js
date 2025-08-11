@@ -1,3 +1,9 @@
+// App configuration
+const APP_CONFIG = {
+  shortcuts: {
+    shuffleVideos: "r",
+  },
+};
 class VideoGridManager {
   constructor(gridSize = 4) {
     this.gridSize = gridSize;
