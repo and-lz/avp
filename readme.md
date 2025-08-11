@@ -6,7 +6,7 @@ AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling mult
 
 - **Dynamic Grid:** Responsive grid adapts to the number of videos.
 - **Auto-Shuffle:** Shuffle videos automatically at intervals (default: every 3 seconds) or toggle on/off.
-- **Fullscreen Support:** Click a video to toggle fullscreen styling (not browser fullscreen).
+- **Fullscreen Support:** Double-click a video to toggle fullscreen styling (not browser fullscreen).
 - **Pin Button Overlay:** Pin videos in place during shuffling by clicking the pin button (📌) or pressing `p` while hovering.
 - **Video Pool Selection:** Select multiple videos at once using the file input or 🎞️ button.
 - **Mute/Unmute on Hover:** Videos are muted by default; the one you hover will play audio.
@@ -40,9 +40,12 @@ index.html      # Main HTML file
 scripts.js      # Main JavaScript logic
 styles.css      # Styles for grid and controls
 helpers/
-	dom.js        # DOM utilities for video/input creation
-	grid.js       # Grid layout helpers
-	util.js       # Utility functions (throttle, debounce, grid template)
+  dom.js        # DOM utilities for video/input creation
+  grid.js       # Grid layout helpers
+  gridShuffle.js # Grid shuffling logic
+  util.js       # Utility functions (throttle, debounce, grid template)
+  video.js      # Video-specific utilities
+  viewTransitionUtil.js # Utilities for view transitions
 ```
 
 ### Setup, Customization & Requirements
