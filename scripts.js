@@ -2,6 +2,30 @@
 let shownVideos = new Set();
 // Declared the missing shownVideos variable as a Set to fix the ReferenceError.
 
+// Auto-shuffle state
+let autoShuffleInterval = null;
+function startAutoShuffle() {
+  if (autoShuffleInterval) return; // Already running
+  autoShuffleInterval = setInterval(() => {
+    shuffleVideosOnGrid();
+  }, 3000);
+  console.log("Auto-shuffle started");
+}
+function stopAutoShuffle() {
+  if (autoShuffleInterval) {
+    clearInterval(autoShuffleInterval);
+    autoShuffleInterval = null;
+    console.log("Auto-shuffle stopped");
+  }
+}
+function shuffleVideosOnGrid() {
+  // Simulate pressing the shuffle shortcut key
+  const event = new KeyboardEvent("keydown", {
+    key: APP_CONFIG.shortcuts.shuffleVideos,
+  });
+  document.dispatchEvent(event);
+}
+
 // Lazy load videos using Intersection Observer
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
@@ -175,6 +199,16 @@ document.addEventListener("DOMContentLoaded", handleDOMContentLoaded);
 document.addEventListener("keydown", function (e) {
   console.log("Key pressed:", e.key);
   console.log("Video pool length:", videoPool.length);
+
+  // Toggle auto-shuffle on 'L' key
+  if (e.key === "l" || e.key === "L") {
+    if (autoShuffleInterval) {
+      stopAutoShuffle();
+    } else {
+      startAutoShuffle();
+    }
+    return;
+  }
 
   // Toggle play/pause for all videos on space bar
   if (e.code === "Space") {
