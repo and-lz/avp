@@ -12,7 +12,6 @@
 function createVideoContainer(id) {
   const container = document.createElement("div");
   container.className = "video-container";
-  container.style.viewTransitionName = `video-container-${id}`; // Set view-transition-name dynamically
 
   const video = window.dom.createVideoElement(`video${id}`);
   video.style.viewTransitionName = `video-${id}`; // Add view-transition-name to the video element

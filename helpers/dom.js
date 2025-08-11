@@ -48,34 +48,13 @@ function setStyles(element, styles) {
  * Toggles the video element's styles between fullscreen and default.
  * @param {HTMLVideoElement} video - The video element to toggle styles for.
  * @param {boolean} [isFullscreen=false] - Whether to apply fullscreen styles.
- * @param {Object} [styles={}] - Additional styles to apply.
  */
-function toggleVideoStyles(video, isFullscreen = false, styles = {}) {
-  const defaultFullscreenStyles = {
-    position: "fixed",
-    top: "0",
-    left: "0",
-    width: "100vw",
-    height: "100vh",
-    zIndex: "999",
-    backgroundColor: "#000",
-  };
-
-  const defaultResetStyles = {
-    position: "",
-    top: "",
-    left: "",
-    width: "",
-    height: "",
-    zIndex: "",
-    backgroundColor: "",
-  };
-
-  const appliedStyles = isFullscreen
-    ? { ...defaultFullscreenStyles, ...styles }
-    : { ...defaultResetStyles, ...styles };
-
-  Object.assign(video.style, appliedStyles);
+function toggleVideoStyles(video, isFullscreen = false) {
+  if (isFullscreen) {
+    video.classList.add("fullscreen");
+  } else {
+    video.classList.remove("fullscreen");
+  }
 }
 
 window.dom = {

@@ -120,3 +120,17 @@ input[type="file"] {
   background: rgba(0, 0, 0, 0.2);
   opacity: 0;
 }
+
+.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100dvw;
+  height: 100dvh;
+  scale: 1;
+  z-index: 9999 !important; /* Ensure maximum priority */
+  background-color: black;
+  pointer-events: auto; /* Ensure interactions are possible */
+  isolation: isolate; /* Create a new stacking context */
+  transform: none; /* Avoid unintended stacking contexts */
+}
