@@ -1,4 +1,6 @@
 // Removed ES6 import and updated references to use window.grid
+let shownVideos = new Set();
+// Declared the missing shownVideos variable as a Set to fix the ReferenceError.
 
 // Lazy load videos using Intersection Observer
 const observer = new IntersectionObserver((entries) => {
@@ -205,32 +207,62 @@ document.addEventListener("keydown", function (e) {
           currentGridVideos.add(v.src);
         }
       }
-      // Prepare a pool of videos not currently on the grid
+      // Helper to get a unique key for each video (file name for File, src for string)
+      function getVideoKey(src) {
+        if (src instanceof File) return src.name;
+        if (src instanceof Blob && src.name) return src.name;
+        if (typeof src === "string") return src;
+        return String(src);
+      }
+      // Prepare a pool of videos not currently on the grid and not already shown
       const availableVideos = videoPool.filter((src) => {
-        if (src instanceof File || src instanceof Blob) {
-          const url = URL.createObjectURL(src);
-          const found = currentGridVideos.has(url);
-          URL.revokeObjectURL(url);
-          return !found;
+        const key = getVideoKey(src);
+        // Check if this video is already on the grid or has been shown
+        let onGrid = false;
+        for (let vSrc of currentGridVideos) {
+          if (vSrc.includes(key)) {
+            onGrid = true;
+            break;
+          }
         }
-        return !currentGridVideos.has(src);
+        return !onGrid && !shownVideos.has(key);
       });
+      // If all videos have been shown, reset shownVideos and availableVideos
+      let videosToShow = availableVideos;
+      if (videosToShow.length === 0) {
+        shownVideos.clear();
+        // Rebuild availableVideos with only those not on the grid
+        videosToShow = videoPool.filter((src) => {
+          const key = getVideoKey(src);
+          let onGrid = false;
+          for (let vSrc of currentGridVideos) {
+            if (vSrc.includes(key)) {
+              onGrid = true;
+              break;
+            }
+          }
+          return !onGrid;
+        });
+      }
       // Shuffle available videos
-      const shuffled = availableVideos.sort(() => Math.random() - 0.5);
+      const shuffled = videosToShow.sort(() => Math.random() - 0.5);
       let shuffledIdx = 0;
       // Fill only unpinned slots with unique videos
       for (let i = 0; i < gridSize; i++) {
         const v = document.getElementById("video" + i);
         if (!pinnedVideos[i]) {
           let url = "";
+          let key = "";
           if (shuffledIdx < shuffled.length) {
             const candidate = shuffled[shuffledIdx];
+            key = getVideoKey(candidate);
             if (candidate instanceof File || candidate instanceof Blob) {
               url = URL.createObjectURL(candidate);
             } else if (typeof candidate === "string") {
               url = candidate;
             }
             currentGridVideos.add(url); // Mark as used
+            shownVideos.add(key); // Mark as shown by key
           }
           if (url) {
             v.src = url;
@@ -513,4 +545,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Declared the missing shownVideos variable as a Set to fix the ReferenceError.
-let shownVideos = new Set();
