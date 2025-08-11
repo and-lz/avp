@@ -141,90 +141,7 @@ document.addEventListener("keydown", function (e) {
   }
 
   if (e.key === APP_CONFIG.shortcuts.shuffleVideos) {
-    if (videoPool.length > 0) {
-      console.log("Shuffling videos...");
-      // Build a set of all videos currently on the grid (including pinned)
-      const currentGridVideos = new Set();
-      for (let i = 0; i < gridSize; i++) {
-        const v = document.getElementById("video" + i);
-        if (v && v.src) {
-          currentGridVideos.add(v.src);
-        }
-      }
-      // Helper to get a unique key for each video (file name for File, src for string)
-      function getVideoKey(src) {
-        if (src instanceof File) return src.name;
-        if (src instanceof Blob && src.name) return src.name;
-        if (typeof src === "string") return src;
-        return String(src);
-      }
-      // Prepare a pool of videos not currently on the grid and not already shown
-      const availableVideos = videoPool.filter((src) => {
-        const key = getVideoKey(src);
-        // Check if this video is already on the grid or has been shown
-        let onGrid = false;
-        for (let vSrc of currentGridVideos) {
-          if (vSrc.includes(key)) {
-            onGrid = true;
-            break;
-          }
-        }
-        return !onGrid && !shownVideos.has(key);
-      });
-      // If all videos have been shown, reset shownVideos and availableVideos
-      let videosToShow = availableVideos;
-      if (videosToShow.length === 0) {
-        shownVideos.clear();
-        // Rebuild availableVideos with only those not on the grid
-        videosToShow = videoPool.filter((src) => {
-          const key = getVideoKey(src);
-          let onGrid = false;
-          for (let vSrc of currentGridVideos) {
-            if (vSrc.includes(key)) {
-              onGrid = true;
-              break;
-            }
-          }
-          return !onGrid;
-        });
-      }
-      // Shuffle available videos
-      const shuffled = videosToShow.sort(() => Math.random() - 0.5);
-      let shuffledIdx = 0;
-      // Fill only unpinned slots with unique videos
-      for (let i = 0; i < gridSize; i++) {
-        const v = document.getElementById("video" + i);
-        if (!pinnedVideos[i]) {
-          let url = "";
-          let key = "";
-          if (shuffledIdx < shuffled.length) {
-            const candidate = shuffled[shuffledIdx];
-            key = getVideoKey(candidate);
-            if (candidate instanceof File || candidate instanceof Blob) {
-              url = URL.createObjectURL(candidate);
-            } else if (typeof candidate === "string") {
-              url = candidate;
-            }
-            currentGridVideos.add(url); // Mark as used
-            shownVideos.add(key); // Mark as shown by key
-          }
-          if (url) {
-            v.src = url;
-            v.muted = true;
-            v.load();
-            v.onloadedmetadata = function () {
-              v.currentTime = v.duration * 0.5;
-              v.play();
-            };
-          } else {
-            v.src = ""; // No unique video available
-          }
-          shuffledIdx++;
-        }
-      }
-    } else {
-      console.log("Video pool is empty. Cannot shuffle videos.");
-    }
+    window.shuffleVideosOnGrid();
   } else if (e.key === "p" || e.key === "P") {
     const hovered = document.querySelector("video:hover");
     if (hovered) {
@@ -279,9 +196,11 @@ function attachHandlers(size) {
 }
 
 // Initial grid size
-let gridSize = 4;
-let pinnedVideos = [];
-initializeGrid(gridSize);
+window.gridSize = 4;
+window.pinnedVideos = [];
+window.shownVideos = new Set();
+window.videoPool = [];
+initializeGrid(window.gridSize);
 
 // Keyboard controls for grid size
 document.addEventListener("keydown", function (e) {
