@@ -15,7 +15,6 @@
       };
     </script>
     <main>
-      
       <section aria-label="Video grid" tabindex="0">
         <div
           id="videoGrid"
@@ -34,6 +33,16 @@
           aria-labelledby="poolInputLabel"
         />
         <button id="poolBtn" autofocus aria-label="Open video pool">🎞️</button>
+        <label for="gridSize" id="gridSizeLabel">Grid size</label>
+        <input
+          type="number"
+          id="gridSize"
+          min="1"
+          max="16"
+          value="4"
+          aria-labelledby="gridSizeLabel"
+          style="width: 4em; margin-left: 1em"
+        />
       </section>
     </main>
     <script src="./helpers/grid.js"></script>

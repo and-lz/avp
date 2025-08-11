@@ -348,9 +348,11 @@ function attachHandlers(size) {
           v.src = url;
           v.muted = true;
           v.load();
+          // Try to autoplay immediately
+          v.play().catch(() => {});
           v.onloadedmetadata = function () {
             v.currentTime = v.duration * 0.5;
-            v.play();
+            v.play().catch(() => {});
           };
         }
       }
