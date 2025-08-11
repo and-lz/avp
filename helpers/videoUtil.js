@@ -129,12 +129,6 @@ function tryPlayVideo(video) {
   });
 }
 
-// Utility: Shuffle array
-function shuffleArray(arr) {
-  if (!Array.isArray(arr)) return [];
-  return arr.slice().sort(() => Math.random() - 0.5);
-}
-
 // Export functions to window for global use
 window.videoUtil = {
   getVideoKey,

@@ -12,7 +12,7 @@ function createVideoContainer(id) {
 }
 
 // Helper function to initialize grid styles
-function setGridStyles(grid, cols, rows) {
+function setGridStyles(grid, cols) {
   grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   grid.style.gridAutoRows = "1fr"; // Let rows auto-flow
 }

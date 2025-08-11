@@ -23,8 +23,14 @@ function debounce(fn, delay) {
   };
 }
 
+function shuffleArray(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.slice().sort(() => Math.random() - 0.5);
+}
+
 window.util = {
   throttle,
   getGridTemplate,
   debounce,
+  shuffleArray,
 };
