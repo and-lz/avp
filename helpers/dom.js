@@ -15,6 +15,7 @@ function createVideoElement(id) {
   video.muted = true;
   video.style.cursor = "default";
   video.style.userSelect = "none";
+  video.style.viewTransitionName = `video-element-${id}`; // Add unique viewTransitionName
   return video;
 }
 

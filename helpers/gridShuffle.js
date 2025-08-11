@@ -162,6 +162,7 @@ function createPinButton(i) {
   pinBtn.dataset.pinned = window.videoGridManager?.pinnedVideos[i]
     ? "true"
     : "false";
+  pinBtn.style.viewTransitionName = `pin-btn-${i}`; // Add unique viewTransitionName
   pinBtn.addEventListener("click", function (e) {
     e.stopPropagation();
     if (window.videoGridManager) {
