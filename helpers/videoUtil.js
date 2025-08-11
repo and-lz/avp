@@ -1,99 +1,100 @@
 function applyVideosFromPool(forceReload = false) {
   initializeGrid(gridSize);
-  videoPoolIndex = 0; // Reset index when grid size changes
-
+  videoPoolIndex = 0;
   if (videoPool.length === 0) {
     console.log("No videos in the pool. Please select videos first.");
     return;
   }
-  // Shuffle pool only once if not already shuffled or if all videos have been shown
-  if (
+  if (shouldReshufflePool(forceReload)) {
+    reshuffleVideoPool();
+  }
+  for (let i = 0; i < gridSize; i++) {
+    const v = document.getElementById("video" + i);
+    const filePath = getNextUnshownVideo();
+    setVideoSource(v, filePath, true);
+  }
+}
+
+function shouldReshufflePool(forceReload) {
+  return (
     forceReload ||
     shuffledVideoPool.length === 0 ||
     shownVideos.size >= videoPool.length
-  ) {
-    shuffledVideoPool = videoPool.slice().sort(() => Math.random() - 0.5);
-    shownVideos.clear(); // Reset the set when reshuffling
-  }
+  );
+}
 
-  for (let i = 0; i < gridSize; i++) {
-    const v = document.getElementById("video" + i);
+function reshuffleVideoPool() {
+  shuffledVideoPool = shuffleArray(videoPool);
+  shownVideos.clear();
+}
 
-    // Find the next video that hasn't been shown yet
-    let filePath;
-    while (videoPoolIndex < shuffledVideoPool.length) {
-      filePath = shuffledVideoPool[videoPoolIndex];
-      videoPoolIndex++;
-      if (!shownVideos.has(filePath)) {
-        shownVideos.add(filePath);
-        break;
-      }
-    }
-
-    if (filePath) {
-      v.src = filePath;
-      v.muted = true;
-      v.load();
-      v.onloadedmetadata = function () {
-        v.currentTime = v.duration * 0.5;
-        v.play().catch((error) => {
-          console.error("Video playback failed:", error);
-        });
-      };
-    } else {
-      v.src = "";
+function getNextUnshownVideo() {
+  let filePath;
+  while (videoPoolIndex < shuffledVideoPool.length) {
+    filePath = shuffledVideoPool[videoPoolIndex];
+    videoPoolIndex++;
+    if (!shownVideos.has(filePath)) {
+      shownVideos.add(filePath);
+      return filePath;
     }
   }
+  return "";
 }
 // Scrubbing is now per-video: mousemove over a video sets only that video's currentTime
 function addScrubHandler(video) {
   let isDragging = false;
   const throttledScrub = window.util.throttle(function (e) {
     if (!isDragging) return;
-    if (video.readyState < 1 || !video.duration) return;
-    const rect = video.getBoundingClientRect();
-    const percent = Math.min(
-      Math.max((e.clientX - rect.left) / rect.width, 0),
-      1
-    );
-    video.currentTime = percent * video.duration;
+    if (!canScrub(video)) return;
+    scrubVideoToMouse(video, e);
   }, 100);
-  video.addEventListener("mousedown", function () {
-    isDragging = true;
-  });
-  window.addEventListener("mouseup", function () {
-    isDragging = false;
-  });
+  video.addEventListener("mousedown", () => (isDragging = true));
+  window.addEventListener("mouseup", () => (isDragging = false));
   video.addEventListener("mousemove", throttledScrub);
+}
+
+function canScrub(video) {
+  return video.readyState >= 1 && !!video.duration;
+}
+
+function scrubVideoToMouse(video, e) {
+  const rect = video.getBoundingClientRect();
+  const percent = Math.min(
+    Math.max((e.clientX - rect.left) / rect.width, 0),
+    1
+  );
+  video.currentTime = percent * video.duration;
 }
 
 function attachFullscreenHandlers() {
   const videos = document.querySelectorAll("video");
   videos.forEach((video) => {
-    video.addEventListener("dblclick", function fullscreenHandler() {
-      videos.forEach((v) => {
-        if (v !== video) {
-          v.pause();
-        }
-      });
-
-      window.dom.toggleVideoStyles(video, true);
-
-      video.addEventListener(
-        "dblclick",
-        function exitFullscreenHandler() {
-          window.dom.toggleVideoStyles(video, false);
-
-          videos.forEach((v) => {
-            v.play();
-          });
-
-          video.removeEventListener("dblclick", exitFullscreenHandler);
-        },
-        { once: true }
-      );
-    });
+    video.addEventListener("dblclick", () => handleFullscreen(video, videos));
   });
+}
+
+function handleFullscreen(video, videos) {
+  pauseOtherVideos(video, videos);
+  window.dom.toggleVideoStyles(video, true);
+  video.addEventListener(
+    "dblclick",
+    function exitFullscreenHandler() {
+      window.dom.toggleVideoStyles(video, false);
+      playAllVideos(videos);
+      video.removeEventListener("dblclick", exitFullscreenHandler);
+    },
+    { once: true }
+  );
+}
+
+function pauseOtherVideos(current, videos) {
+  videos.forEach((v) => {
+    if (v !== current) v.pause();
+  });
+}
+
+function playAllVideos(videos) {
+  videos.forEach((v) => v.play());
 }
 // Utility: Get a unique key for a video source
 function getVideoKey(src) {
@@ -105,28 +106,32 @@ function getVideoKey(src) {
 
 // Utility: Set video source and optionally play
 function setVideoSource(video, src, play = true) {
-  if (video && src) {
-    if (video.src) {
-      URL.revokeObjectURL(video.src);
-    }
-    video.src = src;
-    video.muted = true;
-    video.load();
-    video.onloadedmetadata = function () {
-      video.currentTime = video.duration * 0.5;
-      if (play) {
-        video.play().catch((error) => {
-          console.error("Video playback failed:", error);
-        });
-      }
-    };
-  } else if (video) {
+  if (!video) return;
+  if (!src) {
     video.src = "";
+    return;
   }
+  if (video.src) {
+    URL.revokeObjectURL(video.src);
+  }
+  video.src = src;
+  video.muted = true;
+  video.load();
+  video.onloadedmetadata = function () {
+    video.currentTime = video.duration * 0.5;
+    if (play) tryPlayVideo(video);
+  };
+}
+
+function tryPlayVideo(video) {
+  video.play().catch((error) => {
+    console.error("Video playback failed:", error);
+  });
 }
 
 // Utility: Shuffle array
 function shuffleArray(arr) {
+  if (!Array.isArray(arr)) return [];
   return arr.slice().sort(() => Math.random() - 0.5);
 }
 
