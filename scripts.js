@@ -236,6 +236,4 @@ class VideoGridManager {
 }
 
 // Initialize the manager
-
-// Initialize the manager
 window.videoGridManager = new VideoGridManager();
