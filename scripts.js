@@ -1,5 +1,3 @@
-// ...existing code...
-
 // Pool input and button logic
 document.getElementById("poolBtn").addEventListener("click", function () {
   document.getElementById("poolInput").click();
@@ -22,7 +20,7 @@ document.getElementById("poolInput").addEventListener("change", function (e) {
     const video = document.getElementById(`video${i}`);
     const src = videoPool[i] ? URL.createObjectURL(videoPool[i]) : "";
     if (src) {
-      setVideoSourceAndPlay(video, src);
+      window.videoUtil.setVideoSource(video, src, true);
     } else {
       video.src = "";
     }
@@ -200,7 +198,7 @@ document.addEventListener("keydown", function (e) {
         }
       }
       if (src) {
-        setVideoSourceAndPlay(video, src);
+        window.videoUtil.setVideoSource(video, src, true);
       } else {
         video.src = "";
       }
@@ -229,7 +227,7 @@ document.addEventListener("keydown", function (e) {
         }
       }
       if (src) {
-        setVideoSourceAndPlay(video, src);
+        window.videoUtil.setVideoSource(video, src, true);
       } else {
         video.src = "";
       }
