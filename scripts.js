@@ -370,7 +370,7 @@ function attachHandlers(size) {
 }
 
 // Initial grid size
-let gridSize = 6;
+let gridSize = 4;
 let pinnedVideos = [];
 initializeGrid(gridSize);
 
