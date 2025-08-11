@@ -1,3 +1,8 @@
+/* Grid size input styles */
+#gridSize {
+  width: 4em;
+  margin-left: 1em;
+}
 #poolBtn {
   position: fixed;
   right: 50px;
