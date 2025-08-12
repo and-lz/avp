@@ -142,25 +142,7 @@ class VideoGridManager {
    * @returns {boolean} True if handled, false otherwise.
    */
   handlePlayPauseKey(e) {
-    if (e.code === "Space") {
-      e.preventDefault();
-      const videos = document.querySelectorAll("video");
-      let anyPlaying = false;
-      videos.forEach((video) => {
-        if (!video.paused && !video.ended) {
-          anyPlaying = true;
-        }
-      });
-      videos.forEach((video) => {
-        if (anyPlaying) {
-          video.pause();
-        } else {
-          video.play().catch(() => {});
-        }
-      });
-      return true;
-    }
-    return false;
+    return handlePlayPauseKey(e);
   }
 
   /**
@@ -206,17 +188,7 @@ class VideoGridManager {
    * @returns {boolean} True if handled, false otherwise.
    */
   handleArrowKey(e) {
-    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      const hovered = document.querySelector("video:hover");
-      if (!hovered || isNaN(hovered.duration)) return true;
-      if (e.key === "ArrowLeft") {
-        hovered.currentTime = Math.max(0, hovered.currentTime - 5);
-        return true;
-      }
-      hovered.currentTime = Math.min(hovered.duration, hovered.currentTime + 5);
-      return true;
-    }
-    return false;
+    return handleArrowKey(e);
   }
 
   /**
@@ -268,39 +240,7 @@ class VideoGridManager {
    * @returns {boolean} True if handled, false otherwise.
    */
   handleScrubbingToggle(e) {
-    if (e.key === "s" && !document.body.classList.contains("scrubbing")) {
-      document.body.classList.add("scrubbing");
-      window.videoUtil.pauseAllVideos();
-
-      const handleMouseMove = window.util.throttle((event) => {
-        const videos = document.querySelectorAll("video");
-        const screenWidth = window.innerWidth;
-        const mouseX = event.clientX;
-        const positionRatio = mouseX / screenWidth;
-
-        videos.forEach((video) => {
-          if (!isNaN(video.duration)) {
-            video.currentTime = video.duration * positionRatio;
-          }
-        });
-      }, 100);
-
-      document.addEventListener("mousemove", handleMouseMove);
-
-      const exitScrubbing = (event) => {
-        if (event.key === "d") {
-          document.body.classList.remove("scrubbing");
-          window.videoUtil.playAllVideos();
-          document.removeEventListener("mousemove", handleMouseMove);
-          document.removeEventListener("keydown", exitScrubbing);
-        }
-      };
-
-      document.addEventListener("keydown", exitScrubbing);
-      return true;
-    }
-
-    return false;
+    return handleScrubbingToggle(e);
   }
 
   /**
