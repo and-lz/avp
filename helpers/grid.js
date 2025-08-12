@@ -4,10 +4,9 @@
  */
 
 /**
- * Helper function to create video and input containers
- * @function createVideoContainer
- * @param {number} id - The identifier for the video and input elements.
- * @returns {HTMLElement} The container element with the video and input elements appended.
+ * Creates a video container element with a given ID.
+ * @param {string} id - The ID to assign to the video container.
+ * @returns {HTMLElement} The created video container element.
  */
 function createVideoContainer(id) {
   const container = document.createElement("div");
@@ -24,9 +23,8 @@ function createVideoContainer(id) {
 }
 
 /**
- * Helper function to initialize grid styles
- * @function setGridStyles
- * @param {HTMLElement} grid - The grid element to which the styles will be applied.
+ * Sets the styles for the grid layout.
+ * @param {HTMLElement} grid - The grid element to style.
  * @param {number} cols - The number of columns in the grid.
  */
 function setGridStyles(grid, cols) {
@@ -35,10 +33,10 @@ function setGridStyles(grid, cols) {
 }
 
 /**
- * Applies videos from the pool to the grid.
+ * Applies videos to the grid layout.
  * @param {number} gridSize - The size of the grid.
- * @param {Array} videoPool - The pool of videos to apply.
- * @param {Array} pinnedVideos - The array indicating pinned videos.
+ * @param {Array} videoPool - The pool of available videos.
+ * @param {Array} pinnedVideos - The list of pinned videos.
  */
 function applyVideosToGrid(gridSize, videoPool, pinnedVideos) {
   for (let i = 0; i < gridSize; i++) {
@@ -63,8 +61,8 @@ function applyVideosToGrid(gridSize, videoPool, pinnedVideos) {
 }
 
 /**
- * Initializes the grid with the given size.
- * @param {number} gridSize - The size of the grid.
+ * Initializes the grid with a given size.
+ * @param {number} gridSize - The size of the grid to initialize.
  */
 function initializeGrid(gridSize) {
   const gridElement = document.getElementById("grid");
