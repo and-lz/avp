@@ -34,7 +34,57 @@ function setGridStyles(grid, cols) {
   grid.style.gridAutoRows = "1fr"; // Let rows auto-flow
 }
 
+/**
+ * Applies videos from the pool to the grid.
+ * @param {number} gridSize - The size of the grid.
+ * @param {Array} videoPool - The pool of videos to apply.
+ * @param {Array} pinnedVideos - The array indicating pinned videos.
+ */
+function applyVideosToGrid(gridSize, videoPool, pinnedVideos) {
+  for (let i = 0; i < gridSize; i++) {
+    const video = document.getElementById(`video${i}`);
+    let src = "";
+    if (pinnedVideos[i] && video.src) {
+      continue;
+    }
+    if (videoPool[i]) {
+      if (videoPool[i] instanceof File) {
+        src = URL.createObjectURL(videoPool[i]);
+      } else {
+        src = videoPool[i];
+      }
+    }
+    if (src) {
+      window.videoUtil.setVideoSource(video, src, true);
+    } else {
+      video.src = "";
+    }
+  }
+}
+
+/**
+ * Initializes the grid with the given size.
+ * @param {number} gridSize - The size of the grid.
+ */
+function initializeGrid(gridSize) {
+  const gridElement = document.getElementById("grid");
+  if (!gridElement) return;
+  gridElement.innerHTML = ""; // Clear existing grid
+  for (let i = 0; i < gridSize; i++) {
+    const container = window.grid.createVideoContainer(i);
+    gridElement.appendChild(container);
+  }
+  window.grid.setGridStyles(gridElement, Math.sqrt(gridSize));
+}
+
+// Ensure window.grid is initialized
+window.grid = window.grid || {};
+
+// Export the function for use in other files
+window.grid.initializeGrid = initializeGrid;
+
 window.grid = {
   createVideoContainer,
   setGridStyles,
+  applyVideosToGrid,
 };

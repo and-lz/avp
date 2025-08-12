@@ -126,12 +126,11 @@ class VideoGridManager {
    */
   handleAutoShuffleKey(e) {
     if (e.key === "l") {
-      if (this.autoShuffleInterval) {
-        this.stopAutoShuffle();
-      } else {
-        this.startAutoShuffle();
-      }
-      return true;
+      return toggleAutoShuffle(
+        !!this.autoShuffleInterval,
+        this.startAutoShuffle.bind(this),
+        this.stopAutoShuffle.bind(this)
+      );
     }
     return false;
   }
@@ -247,25 +246,8 @@ class VideoGridManager {
    * Applies the videos from the pool to the grid.
    */
   applyVideosToGrid() {
-    for (let i = 0; i < this.gridSize; i++) {
-      const video = document.getElementById(`video${i}`);
-      let src = "";
-      if (this.pinnedVideos[i] && video.src) {
-        continue;
-      }
-      if (this.videoPool[i]) {
-        if (this.videoPool[i] instanceof File) {
-          src = URL.createObjectURL(this.videoPool[i]);
-        } else {
-          src = this.videoPool[i];
-        }
-      }
-      if (src) {
-        window.videoUtil.setVideoSource(video, src, true);
-      } else {
-        video.src = "";
-      }
-    }
+    const { applyVideosToGrid } = window.grid;
+    applyVideosToGrid(this.gridSize, this.videoPool, this.pinnedVideos);
   }
 
   /**
@@ -292,26 +274,14 @@ class VideoGridManager {
    * @param {number} gridSize - The size of the grid.
    */
   initializeGrid(gridSize) {
-    window.initializeGrid(gridSize);
+    initializeGrid(gridSize);
   }
 
   /**
    * Attaches click handlers for fullscreen functionality.
    */
   attachFullscreenClickHandlers() {
-    const videos = document.querySelectorAll("video");
-    videos.forEach((video) => {
-      video.addEventListener("click", () => {
-        video.classList.add("fullscreen");
-        video.addEventListener(
-          "click",
-          () => {
-            video.classList.remove("fullscreen");
-          },
-          { once: true }
-        );
-      });
-    });
+    attachFullscreenClickHandlers();
   }
 }
 

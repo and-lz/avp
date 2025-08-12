@@ -201,5 +201,47 @@ function initializeGrid(gridSize) {
   grid.appendChild(fragment);
 
   attachHandlers(gridSize);
-  attachFullscreenHandlers();
+  window.videoUtil.attachFullscreenClickHandlers();
 }
+
+// Ensure window.videoUtil.attachFullscreenClickHandlers is defined
+if (!window.videoUtil.attachFullscreenClickHandlers) {
+  window.videoUtil.attachFullscreenClickHandlers = function () {
+    const videos = document.querySelectorAll("video");
+    videos.forEach((video) => {
+      video.addEventListener("click", () => {
+        video.classList.add("fullscreen");
+        video.addEventListener(
+          "click",
+          () => {
+            video.classList.remove("fullscreen");
+          },
+          { once: true }
+        );
+      });
+    });
+  };
+}
+
+// Ensure window.gridShuffle is initialized
+window.gridShuffle = {
+  startAutoShuffle,
+  stopAutoShuffle,
+  getCurrentGridVideos,
+  getAvailableVideos,
+  getFallbackVideos, // Ensure this is included
+  setGridVideos,
+  shuffleVideosOnGrid,
+  attachHandlers,
+  createPinButton,
+  initializeGrid,
+  toggleAutoShuffle: function (isActive, startShuffle, stopShuffle) {
+    if (isActive) {
+      stopShuffle();
+    } else {
+      startShuffle();
+      window.videoUtil.attachFullscreenClickHandlers(); // Ensure fullscreen handlers are attached
+    }
+    return true;
+  },
+};

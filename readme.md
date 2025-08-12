@@ -11,6 +11,7 @@ AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling mult
 - **Video Pool Selection:** Select multiple videos at once using the file input or 🎞️ button.
 - **Mute/Unmute on Hover:** Videos are muted by default; the one you hover will play audio.
 - **Keyboard Shortcuts & Controls:** See below for all shortcuts and controls.
+- **Fallback Video Handling:** Ensures that videos are always available for display, even when no new videos are left to shuffle.
 
 ### Keyboard Shortcuts & Usage Tips
 
@@ -43,7 +44,7 @@ styles.css      # Styles for grid and controls
 helpers/
   dom.js        # DOM utilities for video/input creation
   grid.js       # Grid layout helpers
-  gridShuffle.js # Grid shuffling logic
+  gridShuffle.js # Grid shuffling logic, including fallback video handling
   util.js       # Utility functions (throttle, debounce, grid template)
   video.js      # Video-specific utilities
   viewTransitionUtil.js # Utilities for view transitions
@@ -52,6 +53,7 @@ helpers/
 ### Setup, Customization & Requirements
 
 - No build step required. Just open `index.html` in a browser.
+- **Important:** All `<script>` tags in `index.html` must include the `defer` attribute to ensure proper script execution order.
 - Customize grid size, shuffle interval, and shortcuts in `scripts.js` and `index.html`.
 - Style the grid and controls via `styles.css`.
 - Requires a modern browser (Chrome, Firefox, Edge, Safari).
@@ -81,6 +83,7 @@ AVP excels in scenarios where multi-video presentation and rapid switching are r
 ### Troubleshooting
 
 - If videos do not play, check browser permissions for autoplay and local file access.
+- Ensure all `<script>` tags in `index.html` include the `defer` attribute to avoid script execution issues.
 - For best results, use modern browsers (Chrome, Firefox, Edge, Safari).
 
 ### Contributing

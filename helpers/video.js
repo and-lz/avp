@@ -98,52 +98,29 @@ function scrubVideoToMouse(video, e) {
 }
 
 /**
- * Attaches fullscreen handlers to all videos.
+ * Attaches click handlers for fullscreen functionality.
  */
-function attachFullscreenHandlers() {
+function attachFullscreenClickHandlers() {
   const videos = document.querySelectorAll("video");
   videos.forEach((video) => {
-    video.addEventListener("dblclick", () => handleFullscreen(video, videos));
+    video.addEventListener("click", () => {
+      video.classList.add("fullscreen");
+      video.addEventListener(
+        "click",
+        () => {
+          video.classList.remove("fullscreen");
+        },
+        { once: true }
+      );
+    });
   });
 }
 
-/**
- * Handles fullscreen mode for the video.
- * @param {HTMLVideoElement} video - The video element to handle.
- * @param {NodeListOf<HTMLVideoElement>} videos - All video elements.
- */
-function handleFullscreen(video, videos) {
-  pauseOtherVideos(video, videos);
-  window.dom.toggleVideoStyles(video, true);
-  video.addEventListener(
-    "dblclick",
-    function exitFullscreenHandler() {
-      window.dom.toggleVideoStyles(video, false);
-      playAllVideos(videos);
-      video.removeEventListener("dblclick", exitFullscreenHandler);
-    },
-    { once: true }
-  );
-}
+// Ensure window.videoUtil is initialized
+window.videoUtil = window.videoUtil || {};
 
-/**
- * Pauses all videos except the current one.
- * @param {HTMLVideoElement} current - The current video element.
- * @param {NodeListOf<HTMLVideoElement>} videos - All video elements.
- */
-function pauseOtherVideos(current, videos) {
-  videos.forEach((v) => {
-    if (v !== current) v.pause();
-  });
-}
-
-/**
- * Plays all videos in the list.
- * @param {NodeListOf<HTMLVideoElement>} videos - All video elements to play.
- */
-function playAllVideos(videos) {
-  videos.forEach((v) => v.play());
-}
+// Export the function for use in other files
+window.videoUtil.attachFullscreenClickHandlers = attachFullscreenClickHandlers;
 
 /**
  * Gets a unique key for a video source.
@@ -303,7 +280,6 @@ window.videoUtil = {
   getVideoKey,
   setVideoSource,
   addScrubHandler,
-  attachFullscreenHandlers,
   applyVideosFromPool,
   pauseAllVideos,
   playAllVideos,
