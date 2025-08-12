@@ -1,3 +1,7 @@
+* {
+  transition: all 0.3s ease-in-out;
+}
+
 /* Grid size input styles */
 #gridSize {
   width: 4em;
@@ -133,4 +137,11 @@ input[type="file"] {
   pointer-events: auto; /* Ensure interactions are possible */
   isolation: isolate; /* Create a new stacking context */
   transform: none; /* Avoid unintended stacking contexts */
+}
+
+body.scrubbing {
+  cursor: grabbing;
+  #videoGrid {
+    gap: 5px;
+  }
 }

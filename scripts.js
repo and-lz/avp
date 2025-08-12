@@ -116,6 +116,7 @@ class VideoGridManager {
     if (this.handleArrowKey(e)) return;
     if (this.handleGridIncreaseKey(e)) return;
     if (this.handleGridDecreaseKey(e)) return;
+    if (this.handleScrubbingToggle(e)) return;
   }
 
   /**
@@ -256,6 +257,46 @@ class VideoGridManager {
         this.initializeGrid(this.gridSize);
         this.applyVideosToGrid();
       });
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Toggles the scrubbing feature on 'S' key press.
+   * @param {KeyboardEvent} e - The keydown event.
+   * @returns {boolean} True if handled, false otherwise.
+   */
+  handleScrubbingToggle(e) {
+    if (e.key === "s") {
+      document.body.classList.toggle("scrubbing");
+
+      const handleMouseMove = window.util.throttle((event) => {
+        if (!document.body.classList.contains("scrubbing")) return;
+
+        const videos = document.querySelectorAll("video");
+        const screenWidth = window.innerWidth;
+        const mouseX = event.clientX;
+        const positionRatio = mouseX / screenWidth;
+
+        videos.forEach((video) => {
+          if (!isNaN(video.duration)) {
+            video.currentTime = video.duration * positionRatio;
+          }
+        });
+      }, 100);
+
+      if (document.body.classList.contains("scrubbing")) {
+        document.addEventListener("mousemove", handleMouseMove);
+
+        document.addEventListener("keyup", function exitScrubbing(event) {
+          if (event.key === "S") {
+            document.body.classList.remove("scrubbing");
+            document.removeEventListener("keyup", exitScrubbing);
+          }
+        });
+      }
+
       return true;
     }
     return false;
