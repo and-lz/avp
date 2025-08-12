@@ -1,5 +1,9 @@
 * {
   transition: all 0.3s ease-in-out;
+  &:focus {
+    outline: 2px solid white;
+    box-shadow: 0 0 5px white;
+  }
 }
 
 /* Grid size input styles */
@@ -9,8 +13,8 @@
 }
 .pool-btn {
   position: fixed;
-  right: 50px;
-  bottom: 50px;
+  right: 20px;
+  bottom: 20px;
   background: rgba(255, 255, 255, 0.5);
   border: none;
   font-size: 1.5em;
