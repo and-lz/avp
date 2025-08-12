@@ -3,11 +3,11 @@
 }
 
 /* Grid size input styles */
-#gridSize {
+.grid-size {
   width: 4em;
   margin-left: 1em;
 }
-#poolBtn {
+.pool-btn {
   position: fixed;
   right: 50px;
   bottom: 50px;
@@ -23,7 +23,7 @@
   width: 50px;
   aspect-ratio: 1/1;
 }
-/* Updated to use CSS nesting */
+
 html,
 body {
   background-color: #000;
@@ -84,14 +84,14 @@ input[type="file"] {
   }
 }
 
-#videoGrid {
+.video-grid {
   width: 100vw;
   height: 100vh;
   display: grid;
   gap: 0;
 }
 
-#poolInput {
+.pool-input {
   position: fixed;
   top: 70px;
   left: 50%;
@@ -141,7 +141,7 @@ input[type="file"] {
 
 body.scrubbing {
   cursor: grabbing;
-  #videoGrid {
+  .video-grid {
     gap: 5px;
   }
 }
