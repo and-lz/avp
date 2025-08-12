@@ -191,6 +191,26 @@ function tryPlayVideo(video) {
   });
 }
 
+/**
+ * Pauses all videos on the page.
+ */
+function pauseAllVideos() {
+  const videos = document.querySelectorAll("video");
+  videos.forEach((video) => video.pause());
+}
+
+/**
+ * Plays all videos on the page.
+ */
+function playAllVideos() {
+  const videos = document.querySelectorAll("video");
+  videos.forEach((video) =>
+    video.play().catch((error) => {
+      console.error("Video playback failed:", error);
+    })
+  );
+}
+
 // Export functions to window for global use
 window.videoUtil = {
   getVideoKey,
@@ -198,4 +218,6 @@ window.videoUtil = {
   addScrubHandler,
   attachFullscreenHandlers,
   applyVideosFromPool,
+  pauseAllVideos,
+  playAllVideos,
 };

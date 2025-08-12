@@ -268,12 +268,11 @@ class VideoGridManager {
    * @returns {boolean} True if handled, false otherwise.
    */
   handleScrubbingToggle(e) {
-    if (e.key === "s") {
-      document.body.classList.toggle("scrubbing");
+    if (e.key === "s" && !document.body.classList.contains("scrubbing")) {
+      document.body.classList.add("scrubbing");
+      window.videoUtil.pauseAllVideos();
 
       const handleMouseMove = window.util.throttle((event) => {
-        if (!document.body.classList.contains("scrubbing")) return;
-
         const videos = document.querySelectorAll("video");
         const screenWidth = window.innerWidth;
         const mouseX = event.clientX;
@@ -286,19 +285,21 @@ class VideoGridManager {
         });
       }, 100);
 
-      if (document.body.classList.contains("scrubbing")) {
-        document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mousemove", handleMouseMove);
 
-        document.addEventListener("keyup", function exitScrubbing(event) {
-          if (event.key === "S") {
-            document.body.classList.remove("scrubbing");
-            document.removeEventListener("keyup", exitScrubbing);
-          }
-        });
-      }
+      const exitScrubbing = (event) => {
+        if (event.key === "d") {
+          document.body.classList.remove("scrubbing");
+          window.videoUtil.playAllVideos();
+          document.removeEventListener("mousemove", handleMouseMove);
+          document.removeEventListener("keydown", exitScrubbing);
+        }
+      };
 
+      document.addEventListener("keydown", exitScrubbing);
       return true;
     }
+
     return false;
   }
 

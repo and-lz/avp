@@ -23,7 +23,7 @@ AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling mult
 - **Pin Video:** Click the pin button (📌) or hover and press `p` to pin/unpin.
 - **Adjust Grid Size:** Use minus (`-`) and plus (`+`) keys or the number input.
 - **Change Video Position:** Use left/right arrow keys to seek, or drag across the video area to scrub.
-- **Scrubbing Mode:** Press `s` to toggle scrubbing mode. While active, move the mouse left or right to adjust the position of all videos based on the cursor's horizontal position.
+- **Scrubbing Mode:** Press `s` to start scrubbing mode and `d` to stop. While scrubbing is active, all videos are paused, and you can move the mouse left or right to adjust the position of all videos based on the cursor's horizontal position. When scrubbing stops, all videos resume playback.
 - **Accessibility:** All controls are labeled for screen readers and keyboard navigation.
 
 ### How to Use
