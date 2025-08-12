@@ -2,7 +2,7 @@
  * Applies videos from the pool to the grid. Initializes the grid and sets video sources.
  * @param {boolean} forceReload - Whether to force reload the videos.
  */
-function applyVideosFromPool(forceReload = false) {
+export function applyVideosFromPool(forceReload = false) {
   initializeGrid(gridSize);
   videoPoolIndex = 0;
   if (videoPool.length === 0) {
@@ -24,7 +24,7 @@ function applyVideosFromPool(forceReload = false) {
  * @param {boolean} forceReload - Whether to force reload the videos.
  * @returns {boolean} - True if the pool should be reshuffled, false otherwise.
  */
-function shouldReshufflePool(forceReload) {
+export function shouldReshufflePool(forceReload) {
   return (
     forceReload ||
     shuffledVideoPool.length === 0 ||
@@ -35,7 +35,7 @@ function shouldReshufflePool(forceReload) {
 /**
  * Reshuffles the video pool and clears the set of shown videos.
  */
-function reshuffleVideoPool() {
+export function reshuffleVideoPool() {
   shuffledVideoPool = shuffleArray(videoPool);
   shownVideos.clear();
 }
@@ -44,7 +44,7 @@ function reshuffleVideoPool() {
  * Gets the next unshown video from the shuffled pool.
  * @returns {string} - The file path of the next unshown video, or an empty string if none are available.
  */
-function getNextUnshownVideo() {
+export function getNextUnshownVideo() {
   let filePath;
   while (videoPoolIndex < shuffledVideoPool.length) {
     filePath = shuffledVideoPool[videoPoolIndex];
@@ -62,7 +62,7 @@ function getNextUnshownVideo() {
  * Adds a scrub handler to the video for mouse movement.
  * @param {HTMLVideoElement} video - The video element to add the scrub handler to.
  */
-function addScrubHandler(video) {
+export function addScrubHandler(video) {
   let isDragging = false;
   const throttledScrub = window.util.throttle(function (e) {
     if (!isDragging) return;
@@ -79,7 +79,7 @@ function addScrubHandler(video) {
  * @param {HTMLVideoElement} video - The video element to check.
  * @returns {boolean} - True if the video can be scrubbed, false otherwise.
  */
-function canScrub(video) {
+export function canScrub(video) {
   return video.readyState >= 1 && !!video.duration;
 }
 
@@ -88,7 +88,7 @@ function canScrub(video) {
  * @param {HTMLVideoElement} video - The video element to scrub.
  * @param {MouseEvent} e - The mouse event containing the position.
  */
-function scrubVideoToMouse(video, e) {
+export function scrubVideoToMouse(video, e) {
   const rect = video.getBoundingClientRect();
   const percent = Math.min(
     Math.max((e.clientX - rect.left) / rect.width, 0),

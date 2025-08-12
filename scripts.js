@@ -1,3 +1,27 @@
+import {
+  applyVideosFromPool,
+  canScrub,
+  createInputElement,
+  createVideoElement,
+  createVideoContainer,
+  getAvailableVideos,
+  getCurrentGridVideos,
+  getFallbackVideos,
+  reshuffleVideoPool,
+  setGridStyles,
+  setGridVideos,
+  setStyles,
+  shuffleVideosOnGrid,
+  shouldReshufflePool,
+  toggleVideoStyles,
+} from "./helpers/grid.js";
+import {
+  attachHandlers,
+  createPinButton,
+  startAutoShuffle,
+  stopAutoShuffle,
+} from "./helpers/gridShuffle.js";
+
 /**
  * Application configuration object.
  * @type {Object}
@@ -70,7 +94,7 @@ class VideoGridManager {
   setupGridSizeListener() {
     document
       .getElementById("gridSize")
-      .addEventListener("change", window.videoUtil.applyVideosFromPool);
+      .addEventListener("change", applyVideosFromPool);
   }
 
   /**

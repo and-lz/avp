@@ -8,7 +8,7 @@
  * @param {string} id - The ID to assign to the video container.
  * @returns {HTMLElement} The created video container element.
  */
-function createVideoContainer(id) {
+export function createVideoContainer(id) {
   const container = document.createElement("div");
   container.className = "video-container";
 
@@ -27,7 +27,7 @@ function createVideoContainer(id) {
  * @param {HTMLElement} grid - The grid element to style.
  * @param {number} cols - The number of columns in the grid.
  */
-function setGridStyles(grid, cols) {
+export function setGridStyles(grid, cols) {
   grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
   grid.style.gridAutoRows = "1fr"; // Let rows auto-flow
 }
@@ -38,7 +38,7 @@ function setGridStyles(grid, cols) {
  * @param {Array} videoPool - The pool of available videos.
  * @param {Array} pinnedVideos - The list of pinned videos.
  */
-function applyVideosToGrid(gridSize, videoPool, pinnedVideos) {
+export function applyVideosToGrid(gridSize, videoPool, pinnedVideos) {
   for (let i = 0; i < gridSize; i++) {
     const video = document.getElementById(`video${i}`);
     let src = "";
@@ -64,7 +64,7 @@ function applyVideosToGrid(gridSize, videoPool, pinnedVideos) {
  * Initializes the grid with a given size.
  * @param {number} gridSize - The size of the grid to initialize.
  */
-function initializeGrid(gridSize) {
+export function initializeGrid(gridSize) {
   const gridElement = document.getElementById("grid");
   if (!gridElement) return;
   gridElement.innerHTML = ""; // Clear existing grid

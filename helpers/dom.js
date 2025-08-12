@@ -7,7 +7,7 @@
  * @param {string} id - The id for the video element.
  * @returns {HTMLVideoElement} The created video element.
  */
-function createVideoElement(id) {
+export function createVideoElement(id) {
   const video = document.createElement("video");
   video.id = id;
   video.controls = false;
@@ -26,7 +26,7 @@ function createVideoElement(id) {
  * @param {boolean} [multiple=true] - Whether multiple files can be selected.
  * @returns {HTMLInputElement} The created input element.
  */
-function createInputElement(id, accept = "video/*", multiple = true) {
+export function createInputElement(id, accept = "video/*", multiple = true) {
   const input = document.createElement("input");
   input.type = "file";
   input.id = id;
@@ -40,7 +40,7 @@ function createInputElement(id, accept = "video/*", multiple = true) {
  * @param {HTMLElement} element - The element to set styles on.
  * @param {Object} styles - The styles to set.
  */
-function setStyles(element, styles) {
+export function setStyles(element, styles) {
   Object.assign(element.style, styles);
 }
 
@@ -49,17 +49,10 @@ function setStyles(element, styles) {
  * @param {HTMLVideoElement} video - The video element to toggle styles for.
  * @param {boolean} [isFullscreen=false] - Whether to apply fullscreen styles.
  */
-function toggleVideoStyles(video, isFullscreen = false) {
+export function toggleVideoStyles(video, isFullscreen = false) {
   if (isFullscreen) {
     video.classList.add("fullscreen");
   } else {
     video.classList.remove("fullscreen");
   }
 }
-
-window.dom = {
-  createVideoElement,
-  createInputElement,
-  setStyles,
-  toggleVideoStyles,
-};

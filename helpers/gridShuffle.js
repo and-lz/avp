@@ -2,7 +2,7 @@
  * Starts the automatic shuffling of videos on the grid.
  * @function startAutoShuffle
  */
-function startAutoShuffle() {
+export function startAutoShuffle() {
   if (autoShuffleInterval) return;
   autoShuffleInterval = setInterval(shuffleVideosOnGrid, 3000);
   console.log("Auto-shuffle started");
@@ -12,7 +12,7 @@ function startAutoShuffle() {
  * Stops the automatic shuffling of videos on the grid.
  * @function stopAutoShuffle
  */
-function stopAutoShuffle() {
+export function stopAutoShuffle() {
   if (!autoShuffleInterval) return;
   clearInterval(autoShuffleInterval);
   autoShuffleInterval = null;
@@ -25,7 +25,7 @@ function stopAutoShuffle() {
  * @param {number} gridSize - The size of the grid.
  * @returns {Set} A set of currently displayed video sources.
  */
-function getCurrentGridVideos(gridSize) {
+export function getCurrentGridVideos(gridSize) {
   const currentGridVideos = new Set();
   for (let i = 0; i < gridSize; i++) {
     const v = document.getElementById("video" + i);
@@ -41,7 +41,7 @@ function getCurrentGridVideos(gridSize) {
  * @param {Set} currentGridVideos - A set of currently displayed video sources.
  * @returns {Array} An array of available video sources.
  */
-function getAvailableVideos(currentGridVideos) {
+export function getAvailableVideos(currentGridVideos) {
   const videoPool = window.videoGridManager?.videoPool || [];
   return videoPool.filter((src) => {
     const key = window.videoUtil.getVideoKey(src);
@@ -60,7 +60,7 @@ function getAvailableVideos(currentGridVideos) {
  * @param {Set} currentGridVideos - A set of currently displayed video sources.
  * @returns {Array} An array of fallback video sources.
  */
-function getFallbackVideos(currentGridVideos) {
+export function getFallbackVideos(currentGridVideos) {
   const videoPool = window.videoGridManager?.videoPool || [];
   return videoPool.filter((src) => {
     const key = window.videoUtil.getVideoKey(src);
@@ -77,7 +77,7 @@ function getFallbackVideos(currentGridVideos) {
  * @param {Array} shuffled - An array of shuffled video sources.
  * @param {Set} currentGridVideos - A set of currently displayed video sources.
  */
-function setGridVideos(shuffled, currentGridVideos) {
+export function setGridVideos(shuffled, currentGridVideos) {
   let shuffledIdx = 0;
   const gridSize = window.videoGridManager?.gridSize || 4;
   for (let i = 0; i < gridSize; i++) {
@@ -106,7 +106,7 @@ function setGridVideos(shuffled, currentGridVideos) {
  * Shuffles the videos on the grid.
  * @function shuffleVideosOnGrid
  */
-function shuffleVideosOnGrid() {
+export function shuffleVideosOnGrid() {
   const videoPool = window.videoGridManager?.videoPool || [];
   const gridSize = window.videoGridManager?.gridSize || 4;
   if (videoPool.length === 0) {
@@ -134,7 +134,7 @@ window.shuffleVideosOnGrid = shuffleVideosOnGrid;
  * @function attachHandlers
  * @param {number} gridSize - The size of the grid.
  */
-function attachHandlers(gridSize) {
+export function attachHandlers(gridSize) {
   Array.from({ length: gridSize }).forEach((_, i) => {
     const video = document.getElementById("video" + i);
     if (!video) return;
@@ -154,7 +154,7 @@ function attachHandlers(gridSize) {
  * @param {number} i - The index of the video element.
  * @returns {HTMLButtonElement} The created pin button element.
  */
-function createPinButton(i) {
+export function createPinButton(i) {
   const pinBtn = document.createElement("button");
   pinBtn.className = "pin-btn";
   pinBtn.textContent = "📌";
@@ -181,7 +181,7 @@ function createPinButton(i) {
  * @function initializeGrid
  * @param {number} gridSize - The size of the grid.
  */
-function initializeGrid(gridSize) {
+export function initializeGrid(gridSize) {
   const grid = document.getElementById("videoGrid");
   if (!grid) return;
   grid.innerHTML = "";
@@ -222,26 +222,3 @@ if (!window.videoUtil.attachFullscreenClickHandlers) {
     });
   };
 }
-
-// Ensure window.gridShuffle is initialized
-window.gridShuffle = {
-  startAutoShuffle,
-  stopAutoShuffle,
-  getCurrentGridVideos,
-  getAvailableVideos,
-  getFallbackVideos, // Ensure this is included
-  setGridVideos,
-  shuffleVideosOnGrid,
-  attachHandlers,
-  createPinButton,
-  initializeGrid,
-  toggleAutoShuffle: function (isActive, startShuffle, stopShuffle) {
-    if (isActive) {
-      stopShuffle();
-    } else {
-      startShuffle();
-      window.videoUtil.attachFullscreenClickHandlers(); // Ensure fullscreen handlers are attached
-    }
-    return true;
-  },
-};
