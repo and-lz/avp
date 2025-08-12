@@ -74,6 +74,60 @@ class VideoGridManager {
   }
 
   /**
+   * Handles the grid increase gesture.
+   */
+  handleGridIncreaseGesture() {
+    this.handleGridIncreaseKey({ key: "+" });
+  }
+
+  /**
+   * Handles the grid decrease gesture.
+   */
+  handleGridDecreaseGesture() {
+    this.handleGridDecreaseKey({ key: "-" });
+  }
+
+  /**
+   * Handles the shuffle gesture.
+   */
+  handleShuffleGesture() {
+    this.handleShuffleVideosKey({ key: APP_CONFIG.shortcuts.shuffleVideos });
+  }
+
+  /**
+   * Handles the play/pause gesture.
+   */
+  handlePlayPauseGesture() {
+    this.handlePlayPauseKey({ key: " " });
+  }
+
+  /**
+   * Handles the pause all gesture.
+   */
+  handlePauseAllGesture() {
+    const videos = document.querySelectorAll("video");
+    videos.forEach((video) => video.pause());
+    console.log("All videos paused.");
+  }
+
+  /**
+   * Handles the play all gesture.
+   */
+  handlePlayAllGesture() {
+    const videos = document.querySelectorAll("video");
+    videos.forEach((video) => video.play());
+    console.log("All videos playing.");
+  }
+
+  /**
+   * Handles the refresh gesture (pinch-in).
+   */
+  handleRefreshGesture() {
+    console.log("Shuffling videos...");
+    this.handleShuffleVideosKey({ key: APP_CONFIG.shortcuts.shuffleVideos });
+  }
+
+  /**
    * Handles the pool input change event.
    * @param {Event} e - The change event.
    */
@@ -89,6 +143,17 @@ class VideoGridManager {
     );
     this.gridSize = selectedGridSize;
     this.initializeGrid(this.gridSize);
+
+    // Initialize MultiTouchManager after grid creation
+    const gridContainer = document.getElementById("gridContainer");
+    if (!this.multiTouchManager && gridContainer) {
+      this.multiTouchManager = new MultiTouchManager(gridContainer, {
+        onTwoFingerTap: this.handlePauseAllGesture.bind(this),
+        onThreeFingerTap: this.handlePlayAllGesture.bind(this),
+        onPinchIn: this.handleRefreshGesture.bind(this),
+      });
+    }
+
     for (let i = 0; i < this.gridSize; i++) {
       const video = document.getElementById(`video${i}`);
       const src = this.videoPool[i]
@@ -96,6 +161,7 @@ class VideoGridManager {
         : "";
       if (src) {
         window.videoUtil.setVideoSource(video, src, true);
+        video.setAttribute("playsinline", ""); // Ensure inline playback on iOS
       } else {
         video.src = "";
       }
@@ -285,5 +351,7 @@ class VideoGridManager {
   }
 }
 
-// Initialize the manager
-window.videoGridManager = new VideoGridManager();
+// Ensure DOM is fully loaded before initializing VideoGridManager
+document.addEventListener("DOMContentLoaded", () => {
+  window.videoGridManager = new VideoGridManager();
+});
