@@ -9,10 +9,17 @@
   <body class="overflow-visible">
     <main>
       <section aria-label="Video grid" tabindex="0">
-        <div id="videoGrid" class="video-grid" role="grid" aria-live="polite"></div>
+        <div
+          id="videoGrid"
+          class="video-grid"
+          role="grid"
+          aria-live="polite"
+        ></div>
       </section>
       <section aria-label="Video pool controls">
-        <label for="poolInput" id="poolInputLabel" class="pool-input-label">Add videos</label>
+        <label for="poolInput" id="poolInputLabel" class="pool-input-label"
+          >Add videos</label
+        >
         <input
           type="file"
           id="poolInput"
@@ -21,8 +28,17 @@
           multiple
           aria-labelledby="poolInputLabel"
         />
-        <button id="poolBtn" class="pool-btn" autofocus aria-label="Open video pool">🎞️</button>
-        <label for="gridSize" id="gridSizeLabel" class="grid-size-label">Grid size</label>
+        <button
+          id="poolBtn"
+          class="pool-btn"
+          autofocus
+          aria-label="Open video pool"
+        >
+          🎞️
+        </button>
+        <label for="gridSize" id="gridSizeLabel" class="grid-size-label"
+          >Grid size</label
+        >
         <input
           type="number"
           id="gridSize"
