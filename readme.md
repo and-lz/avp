@@ -59,6 +59,20 @@ helpers/
 - Requires a modern browser (Chrome, Firefox, Edge, Safari).
 - Local video files are needed for preview.
 
+### Project Philosophy
+
+This project is designed to be simple and lightweight, relying only on JavaScript, HTML, and CSS. It avoids the need for a build process, ensuring that you can run it directly in the browser without additional tools or configurations.
+
+#### Why Not Use ES6 Imports/Exports?
+
+While ES6 `import` and `export` statements are powerful, they require a build process (e.g., using Babel) to ensure compatibility across all browsers. To keep this project straightforward and accessible, we use global variables and functions instead of module imports/exports. This approach eliminates the need for tools like Babel or Webpack, making the project easier to set up and use.
+
+### Future Enhancements
+
+In the near future, this project may adopt ES6 `import` and `export` statements along with the `type="module"` attribute in `<script>` tags. This would modernize the codebase and improve modularity. However, this change would require serving files via a local server and targeting only modern browsers (released after 2017) that support ES6 modules natively.
+
+For now, the project avoids this to maintain simplicity and compatibility without requiring a build process or additional tools.
+
 ### Use Case Scenarios
 
 AVP is not intended for single video playback. Its core purpose is to present, shuffle, and interact with multiple videos simultaneously in a dynamic grid.
