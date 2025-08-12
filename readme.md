@@ -65,7 +65,9 @@ This project is designed to be simple and lightweight, relying only on JavaScrip
 
 #### Why Not Use ES6 Imports/Exports?
 
-While ES6 `import` and `export` statements are powerful, they require a build process (e.g., using Babel) to ensure compatibility across all browsers. To keep this project straightforward and accessible, we use global variables and functions instead of module imports/exports. This approach eliminates the need for tools like Babel or Webpack, making the project easier to set up and use.
+While ES6 `import` and `export` statements are powerful, they require a build process (e.g., using Babel) to ensure compatibility across all browsers. Additionally, using ES6 modules with the `type="module"` attribute in `<script>` tags introduces CORS restrictions when running the project directly from the file system (`file://` protocol). Browsers block such requests for security reasons, requiring the project to be served via a local server.
+
+To keep this project straightforward and accessible, we use global variables and functions instead of module imports/exports. This approach eliminates the need for tools like Babel or Webpack and avoids the requirement of running a local server, making the project easier to set up and use.
 
 ### Future Enhancements
 
