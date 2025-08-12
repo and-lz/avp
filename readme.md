@@ -1,6 +1,29 @@
 # AVP Project
 
-AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling multiple videos in a dynamic grid layout. It is designed for quick video previews and auto-shuffling, making it ideal for video pool management, live events, or creative video displays.
+AVP (Automatic Video Pool) is a lightweight, browser-based tool for dynamically displaying and shuffling multiple videos in a responsive grid layout. Designed for simplicity and accessibility, AVP is perfect for video pool management, live events, creative displays, and more. With no build process required, users can run the project directly from their file system using the `file://` protocol, making it ideal for quick setups and offline use.
+
+### Keywords
+
+- Video Grid
+- Video Shuffle
+- Dynamic Video Layout
+- Video Pool Management
+- Live Events
+- Creative Video Displays
+- Video Wall
+- Video Collage
+- Browser-Based Video Tool
+- No Build Process
+- File Protocol Support
+- JavaScript Video Tool
+- HTML5 Video
+- Responsive Video Grid
+- Lightweight Video Manager
+- Offline Video Tool
+- Video Presentation
+- Video Kiosk
+- Video Scrubbing
+- Video Pinning
 
 ### Features
 
@@ -12,6 +35,8 @@ AVP (Automatic Video Pool) is a web-based tool for displaying and shuffling mult
 - **Mute/Unmute on Hover:** Videos are muted by default; the one you hover will play audio.
 - **Keyboard Shortcuts & Controls:** See below for all shortcuts and controls.
 - **Fallback Video Handling:** Ensures that videos are always available for display, even when no new videos are left to shuffle.
+
+AVP is designed to be simple, lightweight, and highly functional, making it a versatile tool for a wide range of video presentation needs.
 
 ### Keyboard Shortcuts & Usage Tips
 
